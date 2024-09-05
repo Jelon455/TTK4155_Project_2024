@@ -1,20 +1,23 @@
+
+
 #define FOCS 4915200
 #define BAUND 9600
 
+#define MYUBRR FOCS /16/ BAUND-1
+
+
 #include <avr/io.h>
+#include <util/delay.h>
 #include <string.h>
 
-void USART_Init()
+
+
+void USART_Init(unsigned int ubrr )
 {
-	/*Baund rate*/
-	unsigned int ubrr  = (FOCS /(16 * BAUND)) - 1;
 	UBRR0H = (unsigned char)(ubrr>>8);
 	UBRR0L = (unsigned char)ubrr;
-	UCSR0A &= ~(1 << U2X0);
-	/*transmission settings*/
-	UCSR0B = (1<<RXEN0) | (1<<TXEN0);
-	/*Set frame format USBS0 - 1 stop bit  ; UCSZ00 - 8data*/
-	UCSR0C = (1<<URSEL0) | (0<<USBS0) | (3<<UCSZ00);
+	UCSR0A = (1<<RXEN0) | (1<<TXEN0);
+	UCSR0C = (1<<URSEL0) | (1<<USBS0) | (3<<UCSZ00);
 }
 
 void USART_Transmit( unsigned char data )
@@ -26,12 +29,6 @@ void USART_Transmit( unsigned char data )
 	UDR0 = data;
 }
 
-char USART_Receive(void)
-{
-	while (!(UCSR0A & (1<<RXC0)));
-	
-	return UDR0;
-}
 void UART_Send_String(const char *str)
 {
 	USART_Transmit(*str);
@@ -39,11 +36,12 @@ void UART_Send_String(const char *str)
 }
 int main(void)
 {
-	USART_Init();
+	USART_Init ( MYUBRR );
 	while(1)
 	{
-		UART_Send_String("HELL\n");
-		for(volatile long i = 0; i < 5000; i++);
+		UART_Send_String("Hello");
+		for(volatile long i = 0; i < 50000; i++);
 	}
 	return 0;
 }
+
