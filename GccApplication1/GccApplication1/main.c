@@ -24,7 +24,7 @@ int USART_Transmit_Char(char c, FILE *stream);
 int USART_Receive_Char(FILE *stream);
 
 void write_to_latch(uint8_t data);
-void init_external_memory_interface();
+void Init(void);
 void SRAM_test(void);
 
 /* === Global variable === */
@@ -50,28 +50,7 @@ char tx_data;
 }*/
 
 int main(void) {
-	// Initialize the external memory interface
-	init_external_memory_interface();
-	// Main loop
-
-		// Example: Blink LEDs by writing different values to the latch
-/*while(1){
-		// Turn on LEDs in pattern 1
-		write_to_latch(0b10101010);  // Set alternate LEDs on/off
-		_delay_ms(500);  // Delay for 500 milliseconds
-
-		// Turn on LEDs in pattern 2
-		write_to_latch(0b01010101);  // Invert the LED pattern
-		_delay_ms(500);  // Delay for 500 milliseconds
-
-		// Repeat the pattern with different values
-		write_to_latch(0xFF);  // Turn all LEDs on
-		_delay_ms(500);  // Delay for 500 milliseconds
-
-		write_to_latch(0x00);  // Turn all LEDs off
-		_delay_ms(500);  // Delay for 500 milliseconds
-		
-}*/
+	Init();
 	USART_Init(UBBR);
 	
 	FILE *uart_stream = fdevopen(USART_Transmit_Char, USART_Receive_Char);
@@ -82,10 +61,10 @@ int main(void) {
 	printf("I am printf!\n\r");
 	
 	SRAM_test();
-	
+	printf("!!!!!!!!!!END OF TEST!!!!!!!!!!!!\n\r");
 	while(1){;}
 		
-	return 0;  // This line is never reached
+	return 0;
 }
 /* === Prototype Declaration === */
 void USART_Init(unsigned int ubbr)
@@ -137,16 +116,16 @@ int USART_Receive_Char(FILE *stream)
 	return UDR0;
 }
 
-
-void init_external_memory_interface() {
-    // Set up the external memory interface
-    MCUCR |= (1 << SRE);  // Enable the external memory interface
+void Init() {
+	/*Enable external memory interface*/
+    MCUCR |= (1 << SRE);
 	/*Disabled JTag pins on port C*/
 	SFIOR |= (1 << XMM2);
 }
 
 void write_to_latch(uint8_t data) {
 	// Write data to the specified address in external memory space
+	PORTE |= (1 << PE1);
 	*(volatile uint8_t *)LATCH_ADDRESS = data;
 }
 
@@ -182,6 +161,27 @@ void SRAM_test(void)
 			retrieval_errors++;
 		}
 	}
-	printf("SRAM test completed with \n%4d errors in write phase and \n%4d errors in retrieval phase\n\n", write_errors, retrieval_errors);
+	printf("SRAM test completed with \n%4d errors in write phase\n\r", write_errors);
+	printf("SRAM test completed with \n%4d errors in retrieval phase\n\r", retrieval_errors);
 }
+
 /* === End od Prototype declaration === */
+
+//		PORTE |= (1 << PE1);
+//		PORTA |= (1<< PA0);
+//write_to_latch(0b10101010);  // Set alternate LEDs on/off
+//		_delay_ms(500);
+//PORTE &= ~(1 << PE1);
+//_delay_ms(500);
+// Turn on LEDs in pattern 2
+//PORTE |= (1 << PE1);
+//		PORTA &= ~(1 << PA0);
+//write_to_latch(0b01010101);;  // Invert the LED pattern
+//PORTE &= ~(1 << PE1);
+//		_delay_ms(500);
+
+//		PORTA |= (1<< PA0);
+//		_delay_ms(500);
+//PORTE &= ~(1 << PE1);
+//		PORTA &= ~(1 << PA0);
+//		_delay_ms(500);
