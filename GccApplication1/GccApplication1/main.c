@@ -14,6 +14,7 @@
 /* === Define area === */
 #define UBBR (FOCS /(16UL * BAUND)) - 1
 #define LATCH_ADDRESS 0x8000
+#define ADC_BASE_ADDRESS 0x1400
 
 /* === Function declaration === */
 void USART_Init(unsigned int ubbr);
@@ -26,6 +27,7 @@ int USART_Receive_Char(FILE *stream);
 void write_to_latch(uint8_t data);
 void Init(void);
 void SRAM_test(void);
+void ADC_test(void);
 
 /* === Global variable === */
 char tx_data;
@@ -61,8 +63,11 @@ int main(void) {
 	printf("I am printf!\n\r");
 	
 	SRAM_test();
-	printf("!!!!!!!!!!END OF TEST!!!!!!!!!!!!\n\r");
-	while(1){;}
+	
+	while(1)
+	{
+    // Read the joystick position from the ADC register
+	}
 		
 	return 0;
 }
@@ -165,6 +170,23 @@ void SRAM_test(void)
 	printf("SRAM test completed with \n%4d errors in retrieval phase\n\r", retrieval_errors);
 }
 
+
+void ADC_test(void)
+{
+	volatile char *ext_ram = (char *) 0x1400; // Start address for the ADC
+	uint16_t ext_ram_size = 0x400;
+
+	printf("Starting ADC test...\n");
+		uint16_t seed = rand();
+		// Write phase: Immediately check that the correct value was stored
+		srand(seed);
+		for (uint16_t i = 0; i < ext_ram_size; i++) 
+		{
+			uint8_t some_value = rand();
+			ext_ram[i] = some_value;
+		}
+			
+}
 /* === End od Prototype declaration === */
 
 //		PORTE |= (1 << PE1);
