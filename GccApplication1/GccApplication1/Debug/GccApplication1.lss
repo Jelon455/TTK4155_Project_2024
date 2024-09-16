@@ -148,7 +148,7 @@ int main(void) {
 }
 
 void write_to_latch(uint8_t data) {
-	/*Write data to the specified address in external memory space*/
+/*Write data to the specified address in external memory space*/
 	PORTE |= (1 << PE1);
 	*(volatile uint8_t *)LATCH_ADDRESS = data;
   e8:	85 b7       	in	r24, 0x35	; 53
@@ -363,7 +363,7 @@ void SRAM_test(void)
 000001fc <USART_Init>:
 char USART_Receive(void)
 {
-	/*Do nothing until data have been recieved and is ready to be read from UDR*/
+/*Do nothing until data have been recieved and is ready to be read from UDR*/
 	while (!(UCSR0A & (1<<RXC0)));
 	return UDR0;
 }
@@ -412,7 +412,7 @@ int USART_Transmit_Char(char c, FILE *stream)
 
 int USART_Receive_Char(FILE *stream)
 {
-	/* Wait until data is received */
+/* Wait until data is received */
 	while (!(UCSR0A & (1 << RXC0)));
  234:	5f 9b       	sbis	0x0b, 7	; 11
  236:	fe cf       	rjmp	.-4      	; 0x234 <USART_Receive_Char>

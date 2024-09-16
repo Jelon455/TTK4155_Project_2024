@@ -13,6 +13,7 @@
 
 #include "UART_driver.h"
 #include "Memory_driver.h"
+#include "ADC_driver.h"
 
 /* === Define area === */
 
@@ -36,7 +37,6 @@ int main(void) {
 	{
     // Read the joystick position from the ADC register
 	}
-		
 	return 0;
 }
 

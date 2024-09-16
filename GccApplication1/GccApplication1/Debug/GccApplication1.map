@@ -61,6 +61,20 @@ Discarded input sections
 
  .data          0x00000000        0x0 D:/Atmel/7.0/Packs/atmel/ATmega_DFP/1.7.374/gcc/dev/atmega162/avr5/crtatmega162.o
  .bss           0x00000000        0x0 D:/Atmel/7.0/Packs/atmel/ATmega_DFP/1.7.374/gcc/dev/atmega162/avr5/crtatmega162.o
+ .text          0x00000000        0x0 ADC_driver.o
+ .data          0x00000000        0x0 ADC_driver.o
+ .bss           0x00000000        0x0 ADC_driver.o
+ .text.Init_ADC
+                0x00000000        0x8 ADC_driver.o
+ .debug_info    0x00000000       0x83 ADC_driver.o
+ .debug_abbrev  0x00000000       0x51 ADC_driver.o
+ .debug_aranges
+                0x00000000       0x20 ADC_driver.o
+ .debug_ranges  0x00000000       0x10 ADC_driver.o
+ .debug_line    0x00000000       0x8a ADC_driver.o
+ .debug_str     0x00000000      0x1aa ADC_driver.o
+ .comment       0x00000000       0x31 ADC_driver.o
+ .debug_frame   0x00000000       0x24 ADC_driver.o
  .text          0x00000000        0x0 main.o
  .data          0x00000000        0x0 main.o
  .bss           0x00000000        0x0 main.o
@@ -293,6 +307,7 @@ Linker script and memory map
 
 Address of section .data set to 0x800100
 LOAD D:/Atmel/7.0/Packs/atmel/ATmega_DFP/1.7.374/gcc/dev/atmega162/avr5/crtatmega162.o
+LOAD ADC_driver.o
 LOAD main.o
 LOAD Memory_driver.o
 LOAD UART_driver.o

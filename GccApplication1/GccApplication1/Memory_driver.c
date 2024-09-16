@@ -54,21 +54,4 @@ void SRAM_test(void)
 	printf("SRAM test completed with \n%4d errors in write phase\n\r", write_errors);
 	printf("SRAM test completed with \n%4d errors in retrieval phase\n\r", retrieval_errors);
 }
-
-
-void ADC_test(void)
-{
-	volatile char *ext_ram = (char *) 0x1400; // Start address for the ADC
-	uint16_t ext_ram_size = 0x400;
-
-	printf("Starting ADC test...\n");
-	uint16_t seed = rand();
-	srand(seed);
-	for (uint16_t i = 0; i < ext_ram_size; i++)
-	{
-		uint8_t some_value = rand();
-		ext_ram[i] = some_value;
-	}
-	
-}
 /* === End of function definition === */
