@@ -8,7 +8,7 @@
 
 /* === Define area === */
 #define ADC_BASE_ADDRESS 0x1400
-#define ADC_CLOCK_PIN PD5
+#define ADC_CLOCK_PIN DDD5
 #define ADC_CHANNEL_X 0x00
 #define ADC_CHANNEL_Y 0x01
 #define ADC_CHANNEL_SLIDER 0x02

@@ -40,6 +40,7 @@ int main(void) {
 	{
 		pos = Get_Joystick_Position();
 		printf("Position x: %d %%, Position y: %d %%\n\r",pos.x, pos.y);
+		_delay_ms(30);
 	}
 	return 0;
 }
