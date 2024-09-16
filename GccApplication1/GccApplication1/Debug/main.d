@@ -19,7 +19,7 @@ main.d main.o: .././main.c \
  d:\atmel\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\stdio.h \
  d:\atmel\7.0\toolchain\avr8\avr8-gnu-toolchain\lib\gcc\avr\5.4.0\include\stdarg.h \
  d:\atmel\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\stdlib.h \
- .././UART_driver.h .././Memory_driver.h
+ .././UART_driver.h .././Memory_driver.h .././ADC_driver.h
 
 d:\atmel\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\avr\io.h:
 
@@ -64,3 +64,5 @@ d:\atmel\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\stdlib.h:
 .././UART_driver.h:
 
 .././Memory_driver.h:
+
+.././ADC_driver.h:

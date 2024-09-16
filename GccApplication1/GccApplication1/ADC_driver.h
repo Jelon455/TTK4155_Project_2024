@@ -14,6 +14,24 @@
 #define ADC_CHANNEL_SLIDER 0x02
 #define JOYSTICK_NEUTRAL_THRESHOLD 20
 
+/* === Object area === */
+typedef enum
+{
+	NEUTRAL,
+	LEFT,
+	RIGHT,
+	UP,
+	DOWN
+} JoystickDirection;
+
+typedef struct
+{
+	/*values x and y are form -100% to 100%*/
+	int8_t x;
+	int8_t y;
+} JoystickPosition;
+
+
 /* === Function declaration === */
 void Init_ADC(void);
 void ADC_test(void);

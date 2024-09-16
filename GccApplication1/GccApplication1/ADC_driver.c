@@ -5,25 +5,9 @@
 /* === Include area === */
 #include <avr/io.h>
 #include <stdint.h>
+
 #include "ADC_driver.h"
-
-/*Directions for joystick*/
-typedef enum 
-{
-	NEUTRAL,
-	LEFT,
-	RIGHT,
-	UP,
-	DOWN
-} JoystickDirection;
-
-/*Position for joystick*/
-typedef struct 
-{
-/*values x and y are form -100% to 100%*/
-	int8_t x;
-	int8_t y;
-} JoystickPosition;
+#include "UART_driver.h"
 
 uint8_t ADC_Read(uint8_t channel) {
 	volatile uint8_t* adc_ptr = (volatile uint8_t*)ADC_BASE_ADDRESS;
@@ -36,7 +20,7 @@ JoystickPosition Get_Joystick_Position(void)
 {
 	JoystickPosition pos;
 
-	uint8_t adc_x = ADC_Read(ADC_CHANNEL_X);
+	uint8_t adc_x = (ADC_CHANNEL_X);
 	uint8_t adc_y = ADC_Read(ADC_CHANNEL_Y);
 
 /*Convert ADC value (0-255) to a percentage (-100% to 100%)*/
@@ -79,14 +63,15 @@ void Init_ADC()
 	ASSR &= ~(1 << AS2);
 /*Configure PD5 as output (to provide a clock to the ADC)*/
 	DDRD |= (1 << ADC_CLOCK_PIN);
-/*
+
 	// Set up Timer1 to generate a PWM signal
 	TCCR1A = (1 << COM1A0) | (1 << WGM10);  // Toggle OC1A on compare match, fast PWM mode
 	TCCR1B = (1 << WGM12) | (1 << CS10);    // No prescaling
 
 	// Set the compare match value to generate a suitable clock signal
-	OCR1A = 128; // Adjust this value to change the clock frequency
-*/
+	
+/*Adjust this value to change the clock frequency*/
+	OCR1A = 128; 
 }
 
 void ADC_test(void)

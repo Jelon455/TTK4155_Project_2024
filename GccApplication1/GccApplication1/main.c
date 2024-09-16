@@ -23,6 +23,7 @@ char tx_data;
 int main(void) {
 	Init();
 	USART_Init(UBBR);
+	Init_ADC();
 	
 	FILE *uart_stream = fdevopen(USART_Transmit_Char, USART_Receive_Char);
 	
@@ -33,9 +34,12 @@ int main(void) {
 	
 	SRAM_test();
 	
+	JoystickPosition pos = {0,0};
+		
 	while(1)
 	{
-    // Read the joystick position from the ADC register
+		pos = Get_Joystick_Position();
+		printf("Position x: %d %%, Position y: %d %%\n\r",pos.x, pos.y);
 	}
 	return 0;
 }

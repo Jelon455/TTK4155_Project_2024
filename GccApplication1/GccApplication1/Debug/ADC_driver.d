@@ -10,7 +10,16 @@ ADC_driver.d ADC_driver.o: .././ADC_driver.c \
  d:\atmel\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\avr\version.h \
  d:\atmel\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\avr\fuse.h \
  d:\atmel\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\avr\lock.h \
- .././ADC_driver.h
+ .././ADC_driver.h .././UART_driver.h \
+ d:\atmel\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\string.h \
+ d:\atmel\7.0\toolchain\avr8\avr8-gnu-toolchain\lib\gcc\avr\5.4.0\include\stddef.h \
+ d:\atmel\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\util\delay.h \
+ d:\atmel\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\util\delay_basic.h \
+ d:\atmel\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\math.h \
+ d:\atmel\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\avr\interrupt.h \
+ d:\atmel\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\stdio.h \
+ d:\atmel\7.0\toolchain\avr8\avr8-gnu-toolchain\lib\gcc\avr\5.4.0\include\stdarg.h \
+ d:\atmel\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\stdlib.h
 
 d:\atmel\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\avr\io.h:
 
@@ -35,3 +44,23 @@ d:\atmel\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\avr\fuse.h:
 d:\atmel\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\avr\lock.h:
 
 .././ADC_driver.h:
+
+.././UART_driver.h:
+
+d:\atmel\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\string.h:
+
+d:\atmel\7.0\toolchain\avr8\avr8-gnu-toolchain\lib\gcc\avr\5.4.0\include\stddef.h:
+
+d:\atmel\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\util\delay.h:
+
+d:\atmel\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\util\delay_basic.h:
+
+d:\atmel\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\math.h:
+
+d:\atmel\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\avr\interrupt.h:
+
+d:\atmel\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\stdio.h:
+
+d:\atmel\7.0\toolchain\avr8\avr8-gnu-toolchain\lib\gcc\avr\5.4.0\include\stdarg.h:
+
+d:\atmel\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\stdlib.h:
