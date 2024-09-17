@@ -9,32 +9,56 @@
 #include "ADC_driver.h"
 #include "UART_driver.h"
 
+/* === Global variables === */
+JoystickCalibration joystick_calibration = {0, 0};
+
+
 uint8_t ADC_Read(uint8_t channel) 
 {
 	volatile uint8_t* adc_ptr = (volatile uint8_t*)ADC_BASE_ADDRESS;
-	_delay_ms(2); //time for the ADC to activate (maybe not necessary)
+	_delay_ms(3); //time for the ADC to activate (maybe not necessary)
 	*adc_ptr = channel;
 	return *adc_ptr;
 }
 
-JoystickPosition Get_Joystick_Position(void) 
+JoystickCalibration Calibrate_Joystick(void) 
+{
+	JoystickCalibration calibration = {0, 0};
+	int32_t x_sum = 0, y_sum = 0;
+	const uint16_t num_samples = 500;
+	
+	printf("Hold the joystic on neutral position!");
+	for (uint16_t i = 0; i < num_samples; i++) 
+	{
+		uint8_t adc_x = ADC_Read(ADC_CHANNEL_X);
+		uint8_t adc_y = ADC_Read(ADC_CHANNEL_Y);
+
+		x_sum += adc_x;
+		y_sum += adc_y;
+	}
+/*Calculate average values as the neutral position */
+	calibration.x_offset = x_sum / num_samples;
+	calibration.y_offset = y_sum / num_samples;
+	return calibration;
+}
+
+JoystickPosition Get_Joystick_Position(JoystickCalibration calibration) 
 {
 	JoystickPosition pos;
 
-	uint8_t adc_x = ADC_Read(ADC_CHANNEL_X);
-	uint8_t adc_y = ADC_Read(ADC_CHANNEL_Y);
-	printf("adc x: %d %%, adc y: %d %%\n\r",adc_x, adc_y);
+	uint8_t adc_x = ADC_Read(ADC_CHANNEL_X) - calibration.x_offset;
+	uint8_t adc_y = ADC_Read(ADC_CHANNEL_Y) - calibration.y_offset;
 
 /*Convert ADC value (0-255) to a percentage (-100% to 100%)*/
-	pos.x = ((int16_t)adc_x) * 100 / 256;
-	pos.y = ((int16_t)adc_y) * 100 / 256;
+    pos.x = ((int16_t)adc_x) * 100 / 128;
+    pos.y = ((int16_t)adc_y) * 100 / 128;
 
 	return pos;
 }
 
 JoystickDirection Get_Joystick_Direction(void) 
 {
-	JoystickPosition pos = Get_Joystick_Position();
+	JoystickPosition pos = Get_Joystick_Position(joystick_calibration);
 	
 /*Direction based on thresholds*/
 	if (pos.x > JOYSTICK_NEUTRAL_THRESHOLD) 
@@ -69,7 +93,7 @@ void Init_ADC()
 /*Prescaler is 1*/
 	TCCR1B |= (1 << CS10) | (1 << WGM12) ;
 /*Half of duty cycle in 0-255 8bit timer register*/
-	OCR1AL = 0b01111111;
+	OCR1AL = 0;
 	OCR1AH = 0;
 }
 
@@ -87,3 +111,4 @@ void ADC_test(void)
 		ext_ram[i] = some_value;
 	}
 }
+

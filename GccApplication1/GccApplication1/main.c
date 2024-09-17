@@ -37,11 +37,15 @@ int main(void) {
 	//SRAM_test();
 	
 	JoystickPosition pos = {0,0};
-		
+	JoystickDirection dir = NEUTRAL;
+	
+	JoystickCalibration joystick_calibration = Calibrate_Joystick();
 	while(1)
 	{		
-		pos = Get_Joystick_Position();
+		pos = Get_Joystick_Position(joystick_calibration);
 		printf("Position x: %d %%, Position y: %d %%\n\r",pos.x, pos.y);
+		dir = Get_Joystick_Direction();
+		printf("Position of joystick: %d\n\r", dir);
 		_delay_ms(500);
 	}
 	return 0;

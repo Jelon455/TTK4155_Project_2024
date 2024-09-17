@@ -1,8 +1,6 @@
 /*
  * ADC_driver.h
  */
-
-
 #ifndef ADC_DRIVER_H_
 #define ADC_DRIVER_H_
 
@@ -13,7 +11,7 @@
 #define ADC_CHANNEL_Y 0b10000001
 #define ADC_CHANNEL_SLIDER 0b10000010
 #define JOYSTICK_NEUTRAL_THRESHOLD 20
-
+	
 /* === Object area === */
 typedef enum
 {
@@ -26,17 +24,23 @@ typedef enum
 
 typedef struct
 {
-	/*values x and y are form -100% to 100%*/
+/*values x and y are form -100% to 100%*/
 	int8_t x;
 	int8_t y;
 } JoystickPosition;
+
+typedef struct 
+{
+	int16_t x_offset;
+	int16_t y_offset;
+} JoystickCalibration;
 
 
 /* === Function declaration === */
 void Init_ADC(void);
 void ADC_test(void);
 uint8_t ADC_Read(uint8_t channel);
-JoystickPosition Get_Joystick_Position(void);
 JoystickDirection Get_Joystick_Direction(void);
-
+JoystickPosition Get_Joystick_Position(JoystickCalibration calibration);
+JoystickCalibration Calibrate_Joystick(void);
 #endif /* ADC_DRIVER_H_ */
