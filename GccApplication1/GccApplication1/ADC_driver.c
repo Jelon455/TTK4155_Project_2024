@@ -12,9 +12,9 @@
 uint8_t ADC_Read(uint8_t channel) 
 {
 	volatile uint8_t* adc_ptr = (volatile uint8_t*)ADC_BASE_ADDRESS;
-
-	adc_ptr[0] = channel;
-	return adc_ptr[0];
+	_delay_ms(2); //time for the ADC to activate (maybe not necessary)
+	*adc_ptr = channel;
+	return *adc_ptr;
 }
 
 JoystickPosition Get_Joystick_Position(void) 
@@ -23,10 +23,11 @@ JoystickPosition Get_Joystick_Position(void)
 
 	uint8_t adc_x = ADC_Read(ADC_CHANNEL_X);
 	uint8_t adc_y = ADC_Read(ADC_CHANNEL_Y);
+	printf("adc x: %d %%, adc y: %d %%\n\r",adc_x, adc_y);
 
 /*Convert ADC value (0-255) to a percentage (-100% to 100%)*/
-	pos.x = ((int16_t)adc_x - 128) * 100 / 128;
-	pos.y = ((int16_t)adc_y - 128) * 100 / 128;
+	pos.x = ((int16_t)adc_x) * 100 / 256;
+	pos.y = ((int16_t)adc_y) * 100 / 256;
 
 	return pos;
 }

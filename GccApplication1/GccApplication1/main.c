@@ -3,6 +3,8 @@
 #define BAUND 9600
 #define F_CPU	FOCS
 
+#define ADC_BASE_ADDRESS 0x1400
+
 /* === Include area === */
 #include <avr/io.h>
 #include <string.h>
@@ -32,15 +34,15 @@ int main(void) {
 	
 	printf("I am printf!\n\r");
 	
-	SRAM_test();
+	//SRAM_test();
 	
 	JoystickPosition pos = {0,0};
 		
 	while(1)
-	{
+	{		
 		pos = Get_Joystick_Position();
 		printf("Position x: %d %%, Position y: %d %%\n\r",pos.x, pos.y);
-		_delay_ms(30);
+		_delay_ms(500);
 	}
 	return 0;
 }
