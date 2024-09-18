@@ -17,7 +17,7 @@ necessary progress in the project.
 - **SN74ALS573C**: Latch
 - **SN74HC00**: NAND Gates
 - **MAX233** : RS232 tranceiver
-- **MAX156*** : ADC with a parallel interfance
+- **MAX156** : ADC with a parallel interfance
 
 # Check point reached:
 - **Initial assembly of microcontroller and RS-232**: implementation for UART comuntcation, basic connection for ATmega162 including power supply, reset button, clock signal 
