@@ -28,3 +28,5 @@ necessary progress in the project.
 - **Reading ADC**: improve time for reading data
 - **Connecting silder with low pass filter**: make connection between filter and slider
 - **Voltage vs joystick**: make an expression explaining relationship between joystic angle and voltage
+- **Button connection**: do the pull up/down resistors, connect buttons to ports of microcontroler?
+  
