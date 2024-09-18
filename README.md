@@ -29,4 +29,5 @@ necessary progress in the project.
 - **Connecting silder with low pass filter**: make connection between filter and slider
 - **Voltage vs joystick**: make an expression explaining relationship between joystic angle and voltage
 - **Button connection**: do the pull up/down resistors, connect buttons to ports of microcontroler?
+- **Channel choosing**: figure out how to choose between chanels
   
