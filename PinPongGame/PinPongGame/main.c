@@ -53,7 +53,7 @@ int main(void) {
 		printf("Position of joystick: %d\n\r", dir);
 		
 		poss = Get_Slider_Position(slider_calibration);
-		printf("Position x: %d %%\n\r",poss.x);
+		printf("Position  x: %d %%\n\r",poss.x);
 		dir = Get_Slider_Direction();
 		printf("Position of slider: %d\n\r", Sdir);
 		_delay_ms(500);
