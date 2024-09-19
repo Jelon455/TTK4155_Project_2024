@@ -33,67 +33,69 @@ JoystickCalibration Calibrate_Joystick(void)
 	uint16_t x_min = 255, x_max = 0, y_min = 255, y_max = 0;
 	const uint16_t num_samples = 500;
 
-	// Etap 1: Pozycja neutralna
-	printf("Etap 1: Trzymaj joystick w pozycji neutralnej.\n");
-	_delay_ms(2000); // Czas na ustawienie joysticka w pozycji neutralnej
+	printf("Step 1: Setting neutral position: Do not move the joystick.\n");
+	_delay_ms(1000);
 
 	for (uint16_t i = 0; i < num_samples; i++)
 	{
 		uint8_t adc_x = ADC_Read(ADC_CHANNEL_X);
 		uint8_t adc_y = ADC_Read(ADC_CHANNEL_Y);
 
-		// Sumowanie dla pozycji neutralnej
 		x_sum += adc_x;
 		y_sum += adc_y;
 
-		_delay_ms(2); // Krótkie opóŸnienie miêdzy odczytami
+		_delay_ms(2);
 	}
 
-	// Obliczenie pozycji neutralnej
 	calibration.x_offset = (int16_t)(x_sum / num_samples);
 	calibration.y_offset = (int16_t)(y_sum / num_samples);
 
-	printf("Pozycja neutralna ustalona: x_offset = %d, y_offset = %d\n", calibration.x_offset, calibration.y_offset);
+	printf("Neutral position set!: x_offset = %d, y_offset = %d\n", calibration.x_offset, calibration.y_offset);
 
-	// Etap 2: Zbieranie minimalnych i maksymalnych wartoœci dla osi X
-	printf("Etap 2: Przesuñ joystick maksymalnie w lewo, a potem w prawo.\n");
-	_delay_ms(2000); // Czas na ustawienie joysticka w pozycji skrajnej (lewa i prawa)
+	printf("Step 2: Calibration x axis: Move joystick in max left.\n");
+	_delay_ms(1000);
 
 	for (uint16_t i = 0; i < num_samples; i++)
 	{
 		uint8_t adc_x = ADC_Read(ADC_CHANNEL_X);
-
 		if (adc_x < x_min) x_min = adc_x;
-		if (adc_x > x_max) x_max = adc_x;
-
-		_delay_ms(2);
 	}
-
-	printf("Wartoœci X: x_min = %d, x_max = %d\n", x_min, x_max);
-
-	// Etap 3: Zbieranie minimalnych i maksymalnych wartoœci dla osi Y
-	printf("Etap 3: Przesuñ joystick maksymalnie w dó³, a potem w górê.\n");
-	_delay_ms(2000); // Czas na ustawienie joysticka w pozycji skrajnej (góra i dó³)
+	
+	printf("Step 3: Calibration x axis: Move joystick in max right.\n");
+	_delay_ms(2000);
 
 	for (uint16_t i = 0; i < num_samples; i++)
 	{
-		uint8_t adc_y = ADC_Read(ADC_CHANNEL_Y);
-
-		if (adc_y < y_min) y_min = adc_y;
-		if (adc_y > y_max) y_max = adc_y;
-
-		_delay_ms(2);
+		uint8_t adc_x = ADC_Read(ADC_CHANNEL_X);
+		if (adc_x > x_max) x_max = adc_x;
 	}
 
-	printf("Wartoœci Y: y_min = %d, y_max = %d\n", y_min, y_max);
+	printf("Values X: x_min = %d, x_max = %d\n", x_min, x_max);
 
-	// Zapisanie wartoœci min i max
+	printf("Step 4: Calibration y axis: Move joystick in max up.\n");
+	_delay_ms(1000);
+	for (uint16_t i = 0; i < num_samples; i++)
+	{
+		uint8_t adc_y = ADC_Read(ADC_CHANNEL_Y);
+		if (adc_y > y_max) y_max = adc_y;
+	}
+
+	printf("Step 5: Calibration y axis: Move joystick in max down.\n");
+	_delay_ms(1000);
+	for (uint16_t i = 0; i < num_samples; i++)
+	{
+		uint8_t adc_y = ADC_Read(ADC_CHANNEL_Y);
+		if (adc_y < y_min) y_min = adc_y;
+	}
+
+	printf("Values Y: y_min = %d, y_max = %d\n", y_min, y_max);
+	_delay_ms(800);
 	calibration.x_min = x_min;
 	calibration.x_max = x_max;
 	calibration.y_min = y_min;
 	calibration.y_max = y_max;
 
-	printf("Kalibracja zakoñczona!\n");
+	printf("Calibration ended!\n");
 	
 	return calibration;
 }
@@ -103,15 +105,12 @@ JoystickPosition Get_Joystick_Position(JoystickCalibration calibration)
 {
 	JoystickPosition pos;
 	
-	// Odczytane wartoœci z ADC
 	int16_t adc_x = (int16_t)ADC_Read(ADC_CHANNEL_X);
 	int16_t adc_y = (int16_t)ADC_Read(ADC_CHANNEL_Y);
 	
-	// Kalibracja wartoœci ADC
 	int16_t adc_x_calibrated = adc_x - calibration.x_offset;
 	int16_t adc_y_calibrated = adc_y - calibration.y_offset;
 	
-	// Przekszta³cenie na procenty
 	if (adc_x_calibrated > 0)
 	{
 		pos.x = (adc_x_calibrated * 100) / (calibration.x_max - calibration.x_offset);
@@ -130,7 +129,6 @@ JoystickPosition Get_Joystick_Position(JoystickCalibration calibration)
 		pos.y = (adc_y_calibrated * 100) / (calibration.y_offset - calibration.y_min);
 	}
 
-	// Ograniczenie wartoœci do przedzia³u -100% do 100%
 	if (pos.x > 100) pos.x = 100;
 	if (pos.x < -100) pos.x = -100;
 	if (pos.y > 100) pos.y = 100;
