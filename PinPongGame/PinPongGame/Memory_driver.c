@@ -54,4 +54,16 @@ void SRAM_test(void)
 	printf("SRAM test completed with \n%4d errors in write phase\n\r", write_errors);
 	printf("SRAM test completed with \n%4d errors in retrieval phase\n\r", retrieval_errors);
 }
+
+void XMEM_Write(uint8_t data, uint16_t addr)
+{
+	volatile uint8_t *ext_mem = (uint8_t *)(addr);
+	*ext_mem = data;
+}
+
+uint8_t XMEM_Read(uint16_t addr)
+{
+	volatile uint8_t *ext_mem = (uint8_t *)(addr);
+	return *ext_mem;
+}
 /* === End of function definition === */

@@ -46,17 +46,33 @@ int main(void) {
 
 	SliderCalibration slider_calibration = Calibrate_Slider();
 	while(1)
-	{		
-		pos = Get_Joystick_Position(joystick_calibration);
-		printf("Position x: %d %%, Position y: %d %%\n\r",pos.x, pos.y);
+	{	
+		/*Right touch button*/
+		DDRE &= ~(1 << PE0);
+		PORTE |= (1 << PE0);
+		/*Left touch button*/
+		DDRE &= ~(1 << PE2);
+		PORTE |= (1 << PE2);
+		/*joystick touch button, inverted logic*/
+		DDRB &= ~(1 << PB2);
+		
+		uint8_t pin_valueE0 = PINE & (1 << PE0);
+		uint8_t pin_valueE2 = PINE & (1 << PE2);
+		uint8_t pin_valueB2 = PINB & (1 << PB2);
+		printf("PIN value right touch button: %d\n\r", pin_valueE0);
+		printf("PIN value left touch button: %d\n\r", pin_valueE2);
+		printf("PIN value joystick touch button: %d\n\r", pin_valueB2);
+		_delay_ms(800);
+/*		pos = Get_Joystick_Position(joystick_calibration);
+		printf("Position x: %d , Position y: %d \n\r",pos.x, pos.y);
 		dir = Get_Joystick_Direction();
 		printf("Position of joystick: %d\n\r", dir);
-		
+		_delay_ms(2000);
 		poss = Get_Slider_Position(slider_calibration);
-		printf("Position  x: %d %%\n\r",poss.x);
+		printf("Position x: %d %%\n\r",poss.x);
 		dir = Get_Slider_Direction();
 		printf("Position of slider: %d\n\r", Sdir);
-		_delay_ms(500);
+		_delay_ms(2000);*/
 	}
 	return 0;
 }
