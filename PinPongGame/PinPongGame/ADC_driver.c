@@ -58,22 +58,30 @@ JoystickPosition Get_Joystick_Position(JoystickCalibration calibration)
 	int16_t adc_y_calibrated = (int16_t)ADC_Read(ADC_CHANNEL_X) - calibration.y_offset;
 
 /*Convert ADC value (0-255) to a percentage (-100% to 100%)*/
-	if (adc_x >= adc_x_calibrated)
-	{
-		pos.x = (adc_x_calibrated * 200/(255 + calibration.x_offset)) - 100;
-	}
-	else if (adc_x < adc_x_calibrated)
+	if (adc_x > adc_x_calibrated)
 	{
 		pos.x = (adc_x_calibrated * 200/(255 - calibration.x_offset)) - 100;
 	}
-	
-	if (adc_y >= adc_y_calibrated)
+	else if (adc_x < adc_x_calibrated)
 	{
-		pos.x = (adc_y_calibrated * 200/(255 + calibration.y_offset)) - 100;
+		pos.x = (adc_x_calibrated * 200/(255 + calibration.x_offset)) - 100;
+	}
+	else
+	{
+		pos.x = (adc_x_calibrated * 200/255) - 100;
+	}
+	
+	if (adc_y > adc_y_calibrated)
+	{
+		pos.y = (adc_y_calibrated * 200/(255 - calibration.y_offset)) - 100;
 	}
 	else if (adc_y < adc_y_calibrated)
 	{
-		pos.x = (adc_y_calibrated * 200/(255 - calibration.y_offset)) - 100;
+		pos.y = (adc_y_calibrated * 200/(255 + calibration.y_offset)) - 100;
+	}
+	else
+	{
+		pos.y = (adc_y_calibrated * 200/255) - 100;
 	}
 	
 	return pos;
