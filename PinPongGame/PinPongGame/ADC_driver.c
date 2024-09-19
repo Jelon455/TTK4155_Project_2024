@@ -12,10 +12,7 @@
 #include "Memory_driver.h"
 
 /* === Global variables === */
-JoystickCalibration joystick_calibration = {0, 0};
-SliderCalibration slider_calibration = {0};
-	
-
+JoystickCalibration joystick_calibration = {0,0,0,0,0};
 
 uint8_t ADC_Read(uint8_t channel) 
 {
@@ -136,10 +133,8 @@ JoystickPosition Get_Joystick_Position(JoystickCalibration calibration)
 
 	return pos;
 }
-char* Get_Joystick_Direction(void) 
-{
-	JoystickPosition pos = Get_Joystick_Position(joystick_calibration);
-	
+char* Get_Joystick_Direction(JoystickPosition pos) 
+{	
 /*Direction based on thresholds*/
 	if (pos.x > JOYSTICK_NEUTRAL_THRESHOLD) 
 	{

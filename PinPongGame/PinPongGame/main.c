@@ -63,14 +63,13 @@ int main(void) {
 		_delay_ms(800);*/
 		pos = Get_Joystick_Position(joystick_calibration);
 		printf("Position x: %d , Position y: %d \n\r",pos.x, pos.y);
-		printf("Position of joystick: %s\n\r", Get_Joystick_Direction());
-//		printf("ANGLE: %d\n\r",Get_Joystick_Angle(pos));
-		_delay_ms(2000);
-/*		poss = Get_Slider_Position(ADC_CHANNEL_SLIDER_LEFT);
+		printf("Position of joystick: %s\n\r", Get_Joystick_Direction(pos));
+		_delay_ms(800);
+		poss = Get_Slider_Position(ADC_CHANNEL_SLIDER_LEFT);
 		printf("Position LEFT : %d %%\n\r",100-poss);	
 		poss_right = Get_Slider_Position(ADC_CHANNEL_SLIDER_RIGHT);
 		printf("Position RIGHT : %d %%\n\r",poss_right);
-		_delay_ms(800);*/
+		_delay_ms(800);
 	}
 	return 0;
 }

@@ -11,19 +11,10 @@
 #define ADC_CHANNEL_Y 0b00000001
 #define ADC_CHANNEL_SLIDER_LEFT 0b00000010
 #define ADC_CHANNEL_SLIDER_RIGHT 0b00000011
-#define JOYSTICK_NEUTRAL_THRESHOLD 40
-#define PI 3.141592654
+#define JOYSTICK_NEUTRAL_THRESHOLD 10
+
 	
 /* === Object area === */
-typedef enum
-{
-	NEUTRAL,
-	LEFT,
-	RIGHT,
-	UP,
-	DOWN
-} JoystickDirection;
-
 typedef struct
 {
 /*values x and y are form -100% to 100%*/
@@ -52,7 +43,7 @@ typedef struct
 void Init_ADC(void);
 void ADC_test(void);
 uint8_t ADC_Read(uint8_t channel);
-char* Get_Joystick_Direction(void);
+char* Get_Joystick_Direction(JoystickPosition pos);
 JoystickPosition Get_Joystick_Position(JoystickCalibration calibration);
 JoystickCalibration Calibrate_Joystick(void);
 int8_t Get_Joystick_Angle(JoystickPosition pos);
