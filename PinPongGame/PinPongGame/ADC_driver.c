@@ -5,6 +5,7 @@
 /* === Include area === */
 #include <avr/io.h>
 #include <stdint.h>
+#include <math.h>
 
 #include "ADC_driver.h"
 #include "UART_driver.h"
@@ -49,91 +50,91 @@ JoystickCalibration Calibrate_Joystick(void)
 JoystickPosition Get_Joystick_Position(JoystickCalibration calibration) 
 {
 	JoystickPosition pos;
-
-	int16_t  adc_x = (int16_t)ADC_Read(ADC_CHANNEL_X) - calibration.x_offset;
-	int16_t  adc_y = (int16_t)ADC_Read(ADC_CHANNEL_Y) - calibration.y_offset;
+	
+	int16_t  adc_x = (int16_t)ADC_Read(ADC_CHANNEL_X);//160
+	int16_t  adc_y = (int16_t)ADC_Read(ADC_CHANNEL_Y);		
+	
+	int16_t adc_x_calibrated = (int16_t)ADC_Read(ADC_CHANNEL_X) - calibration.x_offset; //127
+	int16_t adc_y_calibrated = (int16_t)ADC_Read(ADC_CHANNEL_X) - calibration.y_offset;
 
 /*Convert ADC value (0-255) to a percentage (-100% to 100%)*/
-    pos.x = (adc_x * 200/255) - 100;
-    pos.y = (adc_y * 200/255) - 100;
+	if (adc_x >= adc_x_calibrated)
+	{
+		pos.x = (adc_x_calibrated * 200/(255 + calibration.x_offset)) - 100;
+	}
+	else if (adc_x < adc_x_calibrated)
+	{
+		pos.x = (adc_x_calibrated * 200/(255 - calibration.x_offset)) - 100;
+	}
+	
+	if (adc_y >= adc_y_calibrated)
+	{
+		pos.x = (adc_y_calibrated * 200/(255 + calibration.y_offset)) - 100;
+	}
+	else if (adc_y < adc_y_calibrated)
+	{
+		pos.x = (adc_y_calibrated * 200/(255 - calibration.y_offset)) - 100;
+	}
 	
 	return pos;
 }
 
-JoystickDirection Get_Joystick_Direction(void) 
+char* Get_Joystick_Direction(void) 
 {
 	JoystickPosition pos = Get_Joystick_Position(joystick_calibration);
 	
 /*Direction based on thresholds*/
 	if (pos.x > JOYSTICK_NEUTRAL_THRESHOLD) 
 	{
-		return RIGHT;
+		return "RIGHT";
 	} 
 	else if (pos.x < -JOYSTICK_NEUTRAL_THRESHOLD) 
 	{
-		return LEFT;
+		return "LEFT";
 	} 
 	else if (pos.y > JOYSTICK_NEUTRAL_THRESHOLD) 
 	{
-		return UP;
+		return "UP";
 	} 
 	else if (pos.y < -JOYSTICK_NEUTRAL_THRESHOLD) 
 	{
-		return DOWN;
+		return "DOWN";
 	} 
 	else 
 	{
-		return NEUTRAL;
+		return "NEUTRAL";
 	}
 }
 
-SliderCalibration Calibrate_Slider(void)
+/*int8_t Get_Joystick_Angle(JoystickPosition pos)
 {
-	SliderCalibration calibration = {0};
-	int32_t x_sum = 0;
-	const uint16_t num_samples = 500;
-	
-	printf("Hold the Slider on neutral position!");
-	for (uint16_t i = 0; i < num_samples; i++)
+	double result_radians = 0;
+	int angle ;
+	if (pos.x != 0)
 	{
-		uint8_t adc_x = ADC_Read(ADC_CHANNEL_SLIDER);
-
-		x_sum += adc_x;
-	}
-	/*Calculate average values as the neutral position */
-	calibration.x_offset = x_sum / num_samples;
-	return calibration;
-}
-
-SliderPosition Get_Slider_Position(SliderCalibration calibration)
-{
-	SliderPosition pos;
-
-	uint8_t adc_x = ADC_Read(ADC_CHANNEL_SLIDER) - calibration.x_offset;
-
-	/*Convert ADC value (0-255) to a percentage (-100% to 100%)*/
-	pos.x = ((int16_t)adc_x) * 100 / 128;
-
-	return pos;
-}
-
-SliderDirection Get_Slider_Direction(void)
-{
-	SliderPosition pos = Get_Slider_Position(slider_calibration);
-	
-	/*Direction based on thresholds*/
-	if (pos.x > SLIDER_NEUTRAL_THRESHOLD)
-	{
-		return SRIGHT;
-	}
-	else if (pos.x < -SLIDER_NEUTRAL_THRESHOLD)
-	{
-		return SLEFT;
+		if (pos.x >= 0 && pos.y >= 0)
+			result_radians = atan(pos.y/pos.x); 
+		if (pos.x < 0 && pos.y >= 0)
+			result_radians = PI/2 + atan(-pos.x/pos.y);
+		if (pos.x < 0 && pos.y < 0)
+			result_radians = PI + atan(pos.y/pos.x);
+		if (pos.x >= 0 && pos.y >= 0)
+			result_radians = 3*PI/2 + atan(pos.x/-pos.y);
 	}
 	else
 	{
-		return SNEUTRAL;
-	}
+		result_radians = 0;
+	}             
+	(int8_t) result_radians * 180 / PI ;
+	return(angle);
+}
+*/
+int8_t Get_Slider_Position(uint8_t slider)
+{
+	uint16_t adc_x = ADC_Read(slider);
+
+	/*Convert ADC value (0-255) to a percentage (0% to 100%)*/
+	return (adc_x * 100/255);
 }
 
 void Init_ADC()

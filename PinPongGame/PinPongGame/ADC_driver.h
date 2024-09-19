@@ -9,9 +9,10 @@
 #define ADC_CLOCK_PIN DDD5
 #define ADC_CHANNEL_X 0b00000000
 #define ADC_CHANNEL_Y 0b00000001
-#define ADC_CHANNEL_SLIDER 0b00000010
-#define JOYSTICK_NEUTRAL_THRESHOLD 20
-#define SLIDER_NEUTRAL_THRESHOLD 20
+#define ADC_CHANNEL_SLIDER_LEFT 0b00000010
+#define ADC_CHANNEL_SLIDER_RIGHT 0b00000011
+#define JOYSTICK_NEUTRAL_THRESHOLD 40
+#define PI 3.141592654
 	
 /* === Object area === */
 typedef enum
@@ -23,25 +24,12 @@ typedef enum
 	DOWN
 } JoystickDirection;
 
-typedef enum
-{
-	SNEUTRAL,
-	SLEFT,
-	SRIGHT
-} SliderDirection;
-
 typedef struct
 {
 /*values x and y are form -100% to 100%*/
 	int8_t x;
 	int8_t y;
 } JoystickPosition;
-
-typedef struct
-{
-	/*values x and y are form -100% to 100%*/
-	int8_t x;
-} SliderPosition;
 
 
 typedef struct 
@@ -60,11 +48,9 @@ typedef struct
 void Init_ADC(void);
 void ADC_test(void);
 uint8_t ADC_Read(uint8_t channel);
-JoystickDirection Get_Joystick_Direction(void);
+char* Get_Joystick_Direction(void);
 JoystickPosition Get_Joystick_Position(JoystickCalibration calibration);
 JoystickCalibration Calibrate_Joystick(void);
-
-SliderDirection Get_Slider_Direction(void);
-SliderPosition Get_Slider_Position(SliderCalibration calibration);
-SliderCalibration Calibrate_Slider(void);
+int8_t Get_Joystick_Angle(JoystickPosition pos);
+int8_t Get_Slider_Position(uint8_t slider);
 #endif /* ADC_DRIVER_H_ */
