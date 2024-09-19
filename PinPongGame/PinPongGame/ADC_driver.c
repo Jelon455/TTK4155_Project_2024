@@ -26,67 +26,118 @@ uint8_t ADC_Read(uint8_t channel)
 	return XMEM_Read(ADC_BASE_ADDRESS);
 }
 
-JoystickCalibration Calibrate_Joystick(void) 
+JoystickCalibration Calibrate_Joystick(void)
 {
-	JoystickCalibration calibration = {0, 0};
+	JoystickCalibration calibration;
 	int32_t x_sum = 0, y_sum = 0;
+	uint16_t x_min = 255, x_max = 0, y_min = 255, y_max = 0;
 	const uint16_t num_samples = 500;
-	
-	printf("Hold the joystick on neutral position!");
-	for (uint16_t i = 0; i < num_samples; i++) 
+
+	// Etap 1: Pozycja neutralna
+	printf("Etap 1: Trzymaj joystick w pozycji neutralnej.\n");
+	_delay_ms(2000); // Czas na ustawienie joysticka w pozycji neutralnej
+
+	for (uint16_t i = 0; i < num_samples; i++)
 	{
 		uint8_t adc_x = ADC_Read(ADC_CHANNEL_X);
 		uint8_t adc_y = ADC_Read(ADC_CHANNEL_Y);
 
+		// Sumowanie dla pozycji neutralnej
 		x_sum += adc_x;
 		y_sum += adc_y;
+
+		_delay_ms(2); // Krótkie opóŸnienie miêdzy odczytami
 	}
-/*Calculate average values as the neutral position */
-	calibration.x_offset = (int16_t)(x_sum / num_samples) - 127;
-	calibration.y_offset = (int16_t)(y_sum / num_samples) - 127;
+
+	// Obliczenie pozycji neutralnej
+	calibration.x_offset = (int16_t)(x_sum / num_samples);
+	calibration.y_offset = (int16_t)(y_sum / num_samples);
+
+	printf("Pozycja neutralna ustalona: x_offset = %d, y_offset = %d\n", calibration.x_offset, calibration.y_offset);
+
+	// Etap 2: Zbieranie minimalnych i maksymalnych wartoœci dla osi X
+	printf("Etap 2: Przesuñ joystick maksymalnie w lewo, a potem w prawo.\n");
+	_delay_ms(2000); // Czas na ustawienie joysticka w pozycji skrajnej (lewa i prawa)
+
+	for (uint16_t i = 0; i < num_samples; i++)
+	{
+		uint8_t adc_x = ADC_Read(ADC_CHANNEL_X);
+
+		if (adc_x < x_min) x_min = adc_x;
+		if (adc_x > x_max) x_max = adc_x;
+
+		_delay_ms(2);
+	}
+
+	printf("Wartoœci X: x_min = %d, x_max = %d\n", x_min, x_max);
+
+	// Etap 3: Zbieranie minimalnych i maksymalnych wartoœci dla osi Y
+	printf("Etap 3: Przesuñ joystick maksymalnie w dó³, a potem w górê.\n");
+	_delay_ms(2000); // Czas na ustawienie joysticka w pozycji skrajnej (góra i dó³)
+
+	for (uint16_t i = 0; i < num_samples; i++)
+	{
+		uint8_t adc_y = ADC_Read(ADC_CHANNEL_Y);
+
+		if (adc_y < y_min) y_min = adc_y;
+		if (adc_y > y_max) y_max = adc_y;
+
+		_delay_ms(2);
+	}
+
+	printf("Wartoœci Y: y_min = %d, y_max = %d\n", y_min, y_max);
+
+	// Zapisanie wartoœci min i max
+	calibration.x_min = x_min;
+	calibration.x_max = x_max;
+	calibration.y_min = y_min;
+	calibration.y_max = y_max;
+
+	printf("Kalibracja zakoñczona!\n");
+	
 	return calibration;
 }
 
-JoystickPosition Get_Joystick_Position(JoystickCalibration calibration) 
+
+JoystickPosition Get_Joystick_Position(JoystickCalibration calibration)
 {
 	JoystickPosition pos;
 	
-	int16_t  adc_x = (int16_t)ADC_Read(ADC_CHANNEL_X);//160
-	int16_t  adc_y = (int16_t)ADC_Read(ADC_CHANNEL_Y);		
+	// Odczytane wartoœci z ADC
+	int16_t adc_x = (int16_t)ADC_Read(ADC_CHANNEL_X);
+	int16_t adc_y = (int16_t)ADC_Read(ADC_CHANNEL_Y);
 	
-	int16_t adc_x_calibrated = (int16_t)ADC_Read(ADC_CHANNEL_X) - calibration.x_offset; //127
-	int16_t adc_y_calibrated = (int16_t)ADC_Read(ADC_CHANNEL_X) - calibration.y_offset;
+	// Kalibracja wartoœci ADC
+	int16_t adc_x_calibrated = adc_x - calibration.x_offset;
+	int16_t adc_y_calibrated = adc_y - calibration.y_offset;
+	
+	// Przekszta³cenie na procenty
+	if (adc_x_calibrated > 0)
+	{
+		pos.x = (adc_x_calibrated * 100) / (calibration.x_max - calibration.x_offset);
+	}
+	else
+	{
+		pos.x = (adc_x_calibrated * 100) / (calibration.x_offset - calibration.x_min);
+	}
 
-/*Convert ADC value (0-255) to a percentage (-100% to 100%)*/
-	if (adc_x > adc_x_calibrated)
+	if (adc_y_calibrated > 0)
 	{
-		pos.x = (adc_x_calibrated * 200/(255 - calibration.x_offset)) - 100;
-	}
-	else if (adc_x < adc_x_calibrated)
-	{
-		pos.x = (adc_x_calibrated * 200/(255 + calibration.x_offset)) - 100;
+		pos.y = (adc_y_calibrated * 100) / (calibration.y_max - calibration.y_offset);
 	}
 	else
 	{
-		pos.x = (adc_x_calibrated * 200/255) - 100;
+		pos.y = (adc_y_calibrated * 100) / (calibration.y_offset - calibration.y_min);
 	}
-	
-	if (adc_y > adc_y_calibrated)
-	{
-		pos.y = (adc_y_calibrated * 200/(255 - calibration.y_offset)) - 100;
-	}
-	else if (adc_y < adc_y_calibrated)
-	{
-		pos.y = (adc_y_calibrated * 200/(255 + calibration.y_offset)) - 100;
-	}
-	else
-	{
-		pos.y = (adc_y_calibrated * 200/255) - 100;
-	}
-	
+
+	// Ograniczenie wartoœci do przedzia³u -100% do 100%
+	if (pos.x > 100) pos.x = 100;
+	if (pos.x < -100) pos.x = -100;
+	if (pos.y > 100) pos.y = 100;
+	if (pos.y < -100) pos.y = -100;
+
 	return pos;
 }
-
 char* Get_Joystick_Direction(void) 
 {
 	JoystickPosition pos = Get_Joystick_Position(joystick_calibration);
