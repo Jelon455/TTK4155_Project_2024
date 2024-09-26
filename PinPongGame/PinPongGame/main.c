@@ -26,7 +26,7 @@ char tx_data;
 int main(void) {
 	Init();
 	USART_Init(UBBR);
-	Init_ADC();
+	//Init_ADC();
 	OLED_Init();
 	
 	FILE *uart_stream = fdevopen(USART_Transmit_Char, USART_Receive_Char);
@@ -47,6 +47,7 @@ int main(void) {
 
 	while(1)
 	{	
+		OLED_Write_Data(0x10);
 		/*Right touch button*/
 		DDRE &= ~(1 << PE0);
 		PORTE |= (1 << PE0);
@@ -71,7 +72,8 @@ int main(void) {
 //		printf("Position LEFT : %d %%\n\r",100-poss);	
 //		poss_right = Get_Slider_Position(ADC_CHANNEL_SLIDER_RIGHT);
 //		printf("Position RIGHT : %d %%\n\r",poss_right);
-//		_delay_ms(800);
+		OLED_Init();
+		_delay_ms(2000);
 	}
 	return 0;
 }
