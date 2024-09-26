@@ -36,7 +36,7 @@ int main(void) {
 	
 	printf("I am printf!\n\r");
 	
-	//SRAM_test();
+//	SRAM_test();
 	
 //	JoystickPosition pos = {0,0};
 	
@@ -55,7 +55,7 @@ int main(void) {
 		PORTE |= (1 << PE2);
 		/*joystick touch button, inverted logic*/
 		DDRB &= ~(1 << PB2);
-		
+		//OLED_Print_Char('A');
 /*		uint8_t pin_valueE0 = PINE & (1 << PE0);
 		uint8_t pin_valueE2 = PINE & (1 << PE2);
 		uint8_t pin_valueB2 = PINB & (1 << PB2);
