@@ -151,6 +151,12 @@
     <Compile Include="Memory_driver.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="OLED_driver.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="OLED_driver.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="UART_driver.c">
       <SubType>compile</SubType>
     </Compile>

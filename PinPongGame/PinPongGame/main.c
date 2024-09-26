@@ -16,6 +16,7 @@
 #include "UART_driver.h"
 #include "Memory_driver.h"
 #include "ADC_driver.h"
+#include "OLED_driver.h"
 
 /* === Define area === */
 
@@ -26,6 +27,7 @@ int main(void) {
 	Init();
 	USART_Init(UBBR);
 	Init_ADC();
+	OLED_Init();
 	
 	FILE *uart_stream = fdevopen(USART_Transmit_Char, USART_Receive_Char);
 	
@@ -36,12 +38,12 @@ int main(void) {
 	
 	//SRAM_test();
 	
-	JoystickPosition pos = {0,0};
+//	JoystickPosition pos = {0,0};
 	
-	int8_t poss = {0};
-	int8_t poss_right = {0};	
+//	int8_t poss = {0};
+//	int8_t poss_right = {0};	
 	
-	JoystickCalibration joystick_calibration = Calibrate_Joystick();
+	//JoystickCalibration joystick_calibration = Calibrate_Joystick();
 
 	while(1)
 	{	
@@ -61,15 +63,15 @@ int main(void) {
 		printf("PIN value left touch button: %d\n\r", pin_valueE2);
 		printf("PIN value joystick touch button: %d\n\r", pin_valueB2);
 		_delay_ms(800);*/
-		pos = Get_Joystick_Position(joystick_calibration);
-		printf("Position x: %d , Position y: %d \n\r",pos.x, pos.y);
-		printf("Position of joystick: %s\n\r", Get_Joystick_Direction(pos));
-		_delay_ms(800);
-		poss = Get_Slider_Position(ADC_CHANNEL_SLIDER_LEFT);
-		printf("Position LEFT : %d %%\n\r",100-poss);	
-		poss_right = Get_Slider_Position(ADC_CHANNEL_SLIDER_RIGHT);
-		printf("Position RIGHT : %d %%\n\r",poss_right);
-		_delay_ms(800);
+//		pos = Get_Joystick_Position(joystick_calibration);
+//		printf("Position x: %d , Position y: %d \n\r",pos.x, pos.y);
+//		printf("Position of joystick: %s\n\r", Get_Joystick_Direction(pos));
+//		_delay_ms(800);
+//		poss = Get_Slider_Position(ADC_CHANNEL_SLIDER_LEFT);
+//		printf("Position LEFT : %d %%\n\r",100-poss);	
+//		poss_right = Get_Slider_Position(ADC_CHANNEL_SLIDER_RIGHT);
+//		printf("Position RIGHT : %d %%\n\r",poss_right);
+//		_delay_ms(800);
 	}
 	return 0;
 }
