@@ -9,12 +9,12 @@
 
 
 /* === Function definition === */
-void OLED_Write_Command(uint8_t adress) {
-	XMEM_Write(0x1, OLED_COMMAND_ADDRESS | adress);
+void OLED_Write_Command(uint8_t data) {
+	XMEM_Write(data, OLED_COMMAND_ADDRESS);
 }
 
-void OLED_Write_Data(uint8_t adress) {
-	XMEM_Write(0x11000011, OLED_DATA_ADDRESS | adress);
+void OLED_Write_Data(uint8_t data) {
+	XMEM_Write(data, OLED_DATA_ADDRESS);
 }
 
 void OLED_Init(void) {
