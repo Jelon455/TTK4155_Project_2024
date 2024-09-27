@@ -24,5 +24,6 @@
 void OLED_Init(void);
 void OLED_Write_Command(uint8_t);
 void OLED_Write_Data(uint8_t);
+void OLED_sendCommand(uint8_t);
 
 #endif /* OLED_DRIVER_H_ */

@@ -47,15 +47,17 @@ int main(void) {
 
 	while(1)
 	{	
-		OLED_Write_Data(0x10);
+		//OLED_Write_Command(0xa5);
+		//OLED_Write_Data(0x10);
+		//OLED_Write_Data(0x1100);
 		/*Right touch button*/
-		DDRE &= ~(1 << PE0);
-		PORTE |= (1 << PE0);
+		//DDRE &= ~(1 << PE0);
+		//PORTE |= (1 << PE0);
 		/*Left touch button*/
-		DDRE &= ~(1 << PE2);
-		PORTE |= (1 << PE2);
+		//DDRE &= ~(1 << PE2);
+		//PORTE |= (1 << PE2);
 		/*joystick touch button, inverted logic*/
-		DDRB &= ~(1 << PB2);
+		//DDRB &= ~(1 << PB2);
 		//OLED_Print_Char('A');
 /*		uint8_t pin_valueE0 = PINE & (1 << PE0);
 		uint8_t pin_valueE2 = PINE & (1 << PE2);
@@ -72,8 +74,15 @@ int main(void) {
 //		printf("Position LEFT : %d %%\n\r",100-poss);	
 //		poss_right = Get_Slider_Position(ADC_CHANNEL_SLIDER_RIGHT);
 //		printf("Position RIGHT : %d %%\n\r",poss_right);
-		OLED_Init();
-		_delay_ms(2000);
+		_delay_ms(1000);
+		OLED_Write_Command(0xae);
+		OLED_Write_Command(0xaf);
+		_delay_ms(1000);
+		        OLED_Write_Command(0xB0);    // Sélectionner la page (0xB0 à 0xB7 pour les 8 pages)
+		        OLED_Write_Command(0x00);           // Colonne basse (0x00)
+		        OLED_Write_Command(0x10);
+		OLED_Write_Data(0x11111001);
+		_delay_ms(1000);
 	}
 	return 0;
 }

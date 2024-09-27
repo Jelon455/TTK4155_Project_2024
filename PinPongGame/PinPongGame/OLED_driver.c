@@ -9,12 +9,20 @@
 
 
 /* === Function definition === */
+void OLED_sendCommand(uint8_t cmd) {
+		PORTA = (OLED_COMMAND_ADDRESS | cmd);       
+		PORTD &= ~(1 <<PD6);   // (low WR)
+		_delay_us(1);        
+		PORTD |= (1 << PD6);    // (high WR)
+}
+
+
 void OLED_Write_Command(uint8_t adress) {
-	XMEM_Write(0x1, OLED_COMMAND_ADDRESS | adress);
+	XMEM_Write(adress, OLED_COMMAND_ADDRESS);
 }
 
 void OLED_Write_Data(uint8_t adress) {
-	XMEM_Write(0x11000011, OLED_DATA_ADDRESS | adress);
+	XMEM_Write(adress, OLED_DATA_ADDRESS);
 }
 
 void OLED_Init(void) {
