@@ -23,59 +23,25 @@
 /* === Global variable === */
 char tx_data;
 
-int main(void) {
+int main(void) 
+{
 	Init();
 	USART_Init(UBBR);
-	//Init_ADC();
+	Init_ADC();
 	
 	FILE *uart_stream = fdevopen(USART_Transmit_Char, USART_Receive_Char);
-	
+	FILE oled_stdout = FDEV_SETUP_STREAM(OLED_putchar, NULL, _FDEV_SETUP_WRITE);
 	stdout = uart_stream;
 	stdin = uart_stream;
+	stdout = &oled_stdout;
 	
-	printf("I am printf!\n\r");
 	OLED_Init();
-//	SRAM_test();
+	OLED_Clear();
 	
-//	JoystickPosition pos = {0,0};
-	
-//	int8_t poss = {0};
-//	int8_t poss_right = {0};	
-	
-	//JoystickCalibration joystick_calibration = Calibrate_Joystick();
-		OLED_Clear();
+	printf("HELL YEAH :)");
 	while(1)
 	{	
-		OLED_Clear();
-		_delay_ms(1000);
-		OLED_Write_Char('B', 1, 10);
-		_delay_ms(1000);
-		//OLED_Write_Command(0xa5);
-		/*Right touch button*/
-//		DDRE &= ~(1 << PE0);
-//		PORTE |= (1 << PE0);
-		/*Left touch button*/
-//		DDRE &= ~(1 << PE2);
-//		PORTE |= (1 << PE2);
-		/*joystick touch button, inverted logic*/
-//		DDRB &= ~(1 << PB2);
-		//OLED_Print_Char('A');
-/*		uint8_t pin_valueE0 = PINE & (1 << PE0);
-		uint8_t pin_valueE2 = PINE & (1 << PE2);
-		uint8_t pin_valueB2 = PINB & (1 << PB2);
-		printf("PIN value right touch button: %d\n\r", pin_valueE0);
-		printf("PIN value left touch button: %d\n\r", pin_valueE2);
-		printf("PIN value joystick touch button: %d\n\r", pin_valueB2);
-		_delay_ms(800);*/
-//		pos = Get_Joystick_Position(joystick_calibration);
-//		printf("Position x: %d , Position y: %d \n\r",pos.x, pos.y);
-//		printf("Position of joystick: %s\n\r", Get_Joystick_Direction(pos));
-//		_delay_ms(800);
-//		poss = Get_Slider_Position(ADC_CHANNEL_SLIDER_LEFT);
-//		printf("Position LEFT : %d %%\n\r",100-poss);	
-//		poss_right = Get_Slider_Position(ADC_CHANNEL_SLIDER_RIGHT);
-//		printf("Position RIGHT : %d %%\n\r",poss_right);
-		
+
 	}
 	return 0;
 }
