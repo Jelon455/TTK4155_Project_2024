@@ -43,14 +43,14 @@ int main(void) {
 //	int8_t poss_right = {0};	
 	
 	//JoystickCalibration joystick_calibration = Calibrate_Joystick();
-
+		OLED_Clear();
 	while(1)
 	{	
-		
-		OLED_Write_Command(0xa5);
+		OLED_Clear();
 		_delay_ms(1000);
-		OLED_Write_Command(0xa4);
+		OLED_Write_Char('B', 1, 10);
 		_delay_ms(1000);
+		//OLED_Write_Command(0xa5);
 		/*Right touch button*/
 //		DDRE &= ~(1 << PE0);
 //		PORTE |= (1 << PE0);

@@ -142,7 +142,7 @@
     <Compile Include="ADC_driver.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="Font.h">
+    <Compile Include="fonts.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="main.c">

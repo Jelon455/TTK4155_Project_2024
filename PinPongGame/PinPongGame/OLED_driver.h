@@ -24,5 +24,7 @@
 void OLED_Init(void);
 void OLED_Write_Command(uint8_t);
 void OLED_Write_Data(uint8_t);
-
+void drawA(void);
+void OLED_Clear(void); 
+void OLED_Write_Char(char c, uint8_t page, uint8_t column);
 #endif /* OLED_DRIVER_H_ */
