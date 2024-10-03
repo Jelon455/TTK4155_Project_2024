@@ -20,32 +20,42 @@
 
 /* === Define area === */
 
-/* === Global variable === */
-char tx_data;
+/* === Global definition area === */
+JoystickCalibration calibration = {0,0,255,255,0,0};
+int selected_page = 0;
+/*Flag informing about if user is in subpage*/
+int in_subpage = 0;
 
-int main(void) 
-{
+
+int main(void) {
+	
 	Init();
 	USART_Init(UBBR);
 	Init_ADC();
-	
+
 	FILE *uart_stream = fdevopen(USART_Transmit_Char, USART_Receive_Char);
 	FILE oled_stdout = FDEV_SETUP_STREAM(OLED_putchar, NULL, _FDEV_SETUP_WRITE);
 	stdout = uart_stream;
 	stdin = uart_stream;
-	stdout = &oled_stdout;
+
+	calibration = Calibrate_Joystick();
 	
+	stdout = &oled_stdout;
+
 	OLED_Init();
+	
 	OLED_Clear();
 	
-	printf("HELL YEAH :)");
-	while(1)
-	{	
-
+	Display_Menu(0);
+	
+	_delay_ms(20);
+	while (1) 
+	{
+		Menu_Navigation();
 	}
+
 	return 0;
 }
-
 
 
 

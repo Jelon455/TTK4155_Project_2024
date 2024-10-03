@@ -6,7 +6,17 @@
 #include "OLED_driver.h"
 #include "Memory_driver.h"
 #include "fonts.h"
+#include "ADC_driver.h"
 
+/* === Define area === */
+#define NUM_PAGES 3
+#define RETURN_OPTION 1
+
+/* === Global definition area === */
+static JoystickCalibration calibration = {0,0,255,255,0,0};
+static int selected_page = 0;
+/*Flag informing about if user is in subpage*/
+static int in_subpage = 0; 
 
 /* === Function definition === */
 void OLED_Write_Command(uint8_t data) 
@@ -136,16 +146,102 @@ int OLED_putchar(char c, FILE *stream)
 
 void OLED_Test_Pixel() 
 {
-	OLED_Clear();  // Clear the display first
-
-	// Try writing some test data
+	OLED_Clear();
 	OLED_Set_Page(3);
-	OLED_Write_Command(0x03);         // Set lower column start address
-	OLED_Write_Command(0x10);         // Set higher column start address
+	OLED_Write_Command(0x03); 
+	OLED_Write_Command(0x10);
 	
 	for (uint8_t i = 0; i < 128; i++) 
 	{ 
 		OLED_Write_Data(0xFF); 	
 	}
 		_delay_ms(1000);
+}
+
+void Display_Menu(int selected_page)
+{
+	OLED_Clear();
+	
+	if (selected_page == 0)
+	{
+		OLED_Write_String(">Page 1",0,0);
+		OLED_Write_String(" Page 2",1,0);
+		OLED_Write_String(" Page 3",2,0);
+	}
+	else if (selected_page == 1)
+	{
+		OLED_Write_String(" Page 1",0,0);
+		OLED_Write_String(">Page 2",1,0);
+		OLED_Write_String(" Page 3",2,0);
+	}
+	else if (selected_page == 2)
+	{
+		OLED_Write_String(" Page 1",0,0);
+		OLED_Write_String(" Page 2",1,0);
+		OLED_Write_String(">Page 3",2,0);
+	}
+}
+
+void Display_Subpage(int page)
+{
+	OLED_Clear();
+
+	if (page == 0)
+	{
+		OLED_Write_String("IT IS PAGE 1", 0, 0);
+	}
+	else if (page == 1)
+	{
+		OLED_Write_String("IT IS PAGE 2", 0, 0);
+	}
+	else if (page == 2)
+	{
+		OLED_Write_String("IT IS PAGE 3", 0, 0);
+	}
+	OLED_Write_String("> Back", 6, 0);
+}
+
+void Go_To_Page(int page)
+{
+	in_subpage = 1;
+
+	Display_Subpage(page);
+
+	while (in_subpage)
+	{
+		JoystickPosition pos = Get_Joystick_Position(calibration);
+
+		if (strcmp(Get_Joystick_Direction(pos), "UP") == 0 || strcmp(Get_Joystick_Direction(pos), "DOWN") == 0)
+		{
+			Display_Subpage(page);
+			_delay_ms(200);
+		}
+		if ((PINB & (1 << PINB2)) == 0)
+		{
+			in_subpage = 0;
+		}
+	}
+	Display_Menu(selected_page);
+}
+
+void Menu_Navigation() {
+	JoystickPosition pos = Get_Joystick_Position(calibration);
+
+	if (strcmp(Get_Joystick_Direction(pos), "UP") == 0)
+	{
+		selected_page = (selected_page - 1 + NUM_PAGES) % NUM_PAGES;
+		Display_Menu(selected_page);
+		_delay_ms(200);
+	}
+	else if (strcmp(Get_Joystick_Direction(pos), "DOWN") == 0)
+	{
+		selected_page = (selected_page + 1) % NUM_PAGES;
+		Display_Menu(selected_page);
+		_delay_ms(200);
+	}
+
+	if ((PINB & (1 << PINB2)) == 0)
+	{
+		Go_To_Page(selected_page);
+	}
 }

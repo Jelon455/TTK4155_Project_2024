@@ -158,29 +158,6 @@ char* Get_Joystick_Direction(JoystickPosition pos)
 	}
 }
 
-/*int8_t Get_Joystick_Angle(JoystickPosition pos)
-{
-	double result_radians = 0;
-	int angle ;
-	if (pos.x != 0)
-	{
-		if (pos.x >= 0 && pos.y >= 0)
-			result_radians = atan(pos.y/pos.x); 
-		if (pos.x < 0 && pos.y >= 0)
-			result_radians = PI/2 + atan(-pos.x/pos.y);
-		if (pos.x < 0 && pos.y < 0)
-			result_radians = PI + atan(pos.y/pos.x);
-		if (pos.x >= 0 && pos.y >= 0)
-			result_radians = 3*PI/2 + atan(pos.x/-pos.y);
-	}
-	else
-	{
-		result_radians = 0;
-	}             
-	(int8_t) result_radians * 180 / PI ;
-	return(angle);
-}
-*/
 int8_t Get_Slider_Position(uint8_t slider)
 {
 	uint16_t adc_x = ADC_Read(slider);
