@@ -17,6 +17,7 @@
 #include "Memory_driver.h"
 #include "ADC_driver.h"
 #include "OLED_driver.h"
+#include "SPI_driver.h"
 
 /* === Define area === */
 
@@ -40,16 +41,22 @@ int main(void) {
 
 	calibration = Calibrate_Joystick();
 	
+	_delay_ms(10);
 	stdout = &oled_stdout;
 
 	OLED_Init();
 	
 	OLED_Clear();
 	
+	SPI_Master_Init();
 	Display_Menu(0);
 	_delay_ms(20);
 	while (1) 
 	{
+//		SET_SLAVE();
+//		SPI_Master_Transmit('a');
+//		CLEAR_SLAVE();
+//		_delay_ms(20);
 		Menu_Navigation();
 	}
 

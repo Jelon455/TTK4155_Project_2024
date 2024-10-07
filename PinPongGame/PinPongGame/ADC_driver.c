@@ -29,21 +29,6 @@ JoystickCalibration Calibrate_Joystick(void)
 	int32_t x_sum = 0, y_sum = 0;
 	uint16_t x_min = 255, x_max = 0, y_min = 255, y_max = 0;
 	const uint16_t num_samples = 500;
-	printf("Prepare for calibration!\n\r");
-	_delay_ms(20);
-	printf("Sequence will be:\n\r");
-	_delay_ms(20);
-	printf("1) Neutral position - 1 second\n\r");
-	_delay_ms(20);
-	printf("2) Left position - 2 second\n\r");
-	_delay_ms(20);
-	printf("3) Right position - 2 second\n\r");
-	_delay_ms(20);
-	printf("4) Up position - 2 second\n\r");
-	_delay_ms(20);
-	printf("5) Down position - 2 second\n\r");
-
-	_delay_ms(700);
 	printf("         __ \n");
 	printf("        (  )\n");
 	_delay_ms(20);

@@ -162,20 +162,21 @@ void OLED_Test_Pixel()
 void Display_Menu(int selected_page)
 {
 	
-	OLED_Write_String(" Page 1",0,0);
-	OLED_Write_String(" Page 2",1,0);
-	OLED_Write_String(" Page 3",2,0);
+	OLED_Write_String("     MAIN MENU",0,0);
+	OLED_Write_String(" Page 1",1,0);
+	OLED_Write_String(" Page 2",2,0);
+	OLED_Write_String(" Page 3",3,0);
 	if (selected_page == 0)
-	{
-		OLED_Write_String(">",0,0);
-	}
-	else if (selected_page == 1)
 	{
 		OLED_Write_String(">",1,0);
 	}
-	else if (selected_page == 2)
+	else if (selected_page == 1)
 	{
 		OLED_Write_String(">",2,0);
+	}
+	else if (selected_page == 2)
+	{
+		OLED_Write_String(">",3,0);
 	}
 }
 
