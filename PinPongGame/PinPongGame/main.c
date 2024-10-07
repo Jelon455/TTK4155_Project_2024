@@ -47,7 +47,6 @@ int main(void) {
 	OLED_Clear();
 	
 	Display_Menu(0);
-	
 	_delay_ms(20);
 	while (1) 
 	{

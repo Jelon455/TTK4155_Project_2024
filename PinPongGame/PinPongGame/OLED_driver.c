@@ -99,6 +99,7 @@ void OLED_Write_Char(char c, uint8_t page, uint8_t column)
 		_delay_ms(10);
 	}
 }
+
 void OLED_Write_String(const char* str, uint8_t page, uint8_t column) 
 {
 	uint8_t currentPage = page;
@@ -221,7 +222,8 @@ void Go_To_Page(int page)
 	Display_Menu(selected_page);
 }
 
-void Menu_Navigation() {
+void Menu_Navigation() 
+{
 	JoystickPosition pos = Get_Joystick_Position(calibration);
 
 	if (strcmp(Get_Joystick_Direction(pos), "UP") == 0)
