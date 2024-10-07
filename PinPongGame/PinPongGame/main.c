@@ -40,16 +40,16 @@ int in_subpage = 0;
 
 #define CS_MCP2515     PB4  // Chip Select for MCP2515 on Port B
 
-
-
+void MCP2515_reset(void);
+void MCP2515_write(uint8_t, uint8_t);
 
 
 void SPI_init(void) {
 	// Set MOSI, SCK, and SS as output, MISO as input
-	DDRB = (1<<PB5) | (1<<PB7) | (1<<PB4);  // MOSI: PB5, SCK: PB7, SS: PB4
+	DDRB |= (1<<PB5) | (1<<PB7) | (1<<PB4);  // MOSI: PB5, SCK: PB7, SS: PB4
 	DDRB &= ~(1<<PB6);                      // MISO: PB6 as input
 	// Enable SPI, set as Master, set clock rate (Fosc/16)
-	SPCR = (1<<SPE) | (1<<MSTR) | (1<<SPR0) ;
+	SPCR |= (1<<SPE) | (1<<MSTR) | (1<<SPR0) ;
 }
 
 
@@ -102,7 +102,7 @@ uint8_t MCP2515_read(uint8_t address) {
 	uint8_t result;
 	SPI_transmit(MCP_READ);        // Send read command
 	SPI_transmit(address); 
-	SPI_transmit(0x00);        // Send register address
+	SPI_transmit(0xCC);        // Send register address
 	result = SPDR; 
 	return result;                 // Return the read result
 }
@@ -133,7 +133,6 @@ int main(void) {
 	FILE *uart_stream = fdevopen(USART_Transmit_Char, USART_Receive_Char);
 	stdout = uart_stream;
 	stdin = uart_stream;
-	printf("Hreloo");
 	
     // Initialize SPI
     SPI_init();
@@ -141,11 +140,13 @@ int main(void) {
     while(1) {
 		    // Reset MCP2515
 		    MCP2515_reset();
+			//uint8_t value_1 = MCP2515_read(0x0F);
+			//_delay_ms(500);
 
-		    // Write a value to a register (for example, to the CANCTRL register)
 		    MCP2515_write(0x0F, 0xCC); 
-		    uint8_t value = MCP2515_read(0x0F);
-			printf("%d \n",value);
+		    uint8_t value_2 = MCP2515_read(0x0F);
+			//printf("%d and %d \n",value_1,value_2);
+			printf("%d \n",value_2);
 			_delay_ms(500);
 	}
 	return 0 ;
