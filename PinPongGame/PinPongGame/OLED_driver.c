@@ -99,6 +99,7 @@ void OLED_Write_Char(char c, uint8_t page, uint8_t column)
 		_delay_ms(10);
 	}
 }
+
 void OLED_Write_String(const char* str, uint8_t page, uint8_t column) 
 {
 	uint8_t currentPage = page;
@@ -161,20 +162,21 @@ void OLED_Test_Pixel()
 void Display_Menu(int selected_page)
 {
 	
-	OLED_Write_String(" Page 1",0,0);
-	OLED_Write_String(" Page 2",1,0);
-	OLED_Write_String(" Page 3",2,0);
+	OLED_Write_String("     MAIN MENU",0,0);
+	OLED_Write_String(" Page 1",1,0);
+	OLED_Write_String(" Page 2",2,0);
+	OLED_Write_String(" Page 3",3,0);
 	if (selected_page == 0)
-	{
-		OLED_Write_String(">",0,0);
-	}
-	else if (selected_page == 1)
 	{
 		OLED_Write_String(">",1,0);
 	}
-	else if (selected_page == 2)
+	else if (selected_page == 1)
 	{
 		OLED_Write_String(">",2,0);
+	}
+	else if (selected_page == 2)
+	{
+		OLED_Write_String(">",3,0);
 	}
 }
 
@@ -221,7 +223,8 @@ void Go_To_Page(int page)
 	Display_Menu(selected_page);
 }
 
-void Menu_Navigation() {
+void Menu_Navigation() 
+{
 	JoystickPosition pos = Get_Joystick_Position(calibration);
 
 	if (strcmp(Get_Joystick_Direction(pos), "UP") == 0)

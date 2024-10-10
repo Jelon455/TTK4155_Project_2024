@@ -1,5 +1,12 @@
 # Prerequisites
 *.d
+*.atsuo
+*.eep
+*.lss
+*.srec
+*.mk
+
+
 
 # Object files
 *.o
