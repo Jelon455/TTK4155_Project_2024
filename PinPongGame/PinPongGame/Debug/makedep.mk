@@ -4,6 +4,10 @@
 
 ADC_driver.c
 
+CAN_connection.c
+
+CAN_control.c
+
 main.c
 
 MCP2515_driver.c

@@ -142,16 +142,22 @@
     <Compile Include="ADC_driver.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="CAN_connection.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="CAN_connection.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="CAN_control.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="CAN_control.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="fonts.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="main.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="MCP2515_driver.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="MCP2515_driver.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="Memory_driver.c">
@@ -164,12 +170,6 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="OLED_driver.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="SPI_driver.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="SPI_driver.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="UART_driver.c">
