@@ -1,44 +1,49 @@
 /*
- * SPI_driver.c
- */
-
-/* === Include area === */
+ * CAN_connection.c
+ */ 
 #include "SPI_driver.h"
 
-void SPI_Master_Init(void)
+/* Define Chip Select Pin for MCP2515 */
+#define CS_MCP2515   PB4
+
+/* === Function definition === */
+void SPI_Init(void) 
 {
-	/*PB4 PB5 and PB7 set as output*/
-	DDRB |= (1 << DDB4) | (1 << DDB5) | (1 << DDB7);
-	/*PB6 as input*/
-	DDRB &= ~(1 << DDB6);
+	/*Set MOSI (PB5), SCK (PB7) as output, and SS (PB4) as output*/
+	DDRB |= (1 << PB5) | (1 << PB7) | (1 << CS_MCP2515);
+	/*Set MISO (PB6) as input*/
+	DDRB &= ~(1 << PB6);
 	
-	/*SPE: Enable SPI, MSTR: Master mode, SPR0: Set clock rate to 16MHz*/
-	SPCR |= (1 << SPE) | (1 << MSTR) | (1 << SPR0);
-	
-	/*SPI2X:Double SPI Speed Bit is disabled*/
-	SPSR &= ~(1 << SPI2X);
+	PORTB |= (1 << CS_MCP2515);
+
+	/*Enable SPI, set Master mode, clock rate fosc/16*/
+	SPCR = (1 << SPE) | (1 << MSTR) | (1 << SPR0);
 }
 
-void SPI_Master_Transmit(char cData)
+void SPI_Write(char data)		/* SPI write data function */
 {
-	/* Start transmission */
-	SPDR = cData;
-	/* Wait for transmission complete */
-	while(!(SPSR & (1 << SPIF)))
-	;
+//	char flush_buffer;
+	SPDR = data;			/* Write data to SPI data register */
+	while(!(SPSR & (1<<SPIF)));	/* Wait till transmission complete */
+//	flush_buffer = SPDR;		/* Flush received data */
+	/* Note: SPIF flag is cleared by first reading SPSR (with SPIF set) and then accessing SPDR hence flush buffer used here to access SPDR after SPSR read */
 }
-void SPI_Slave_Init(void)
+
+char SPI_Read(void)				/* SPI read data function */
 {
-	/* Set MISO output, all others input */
-	DDRB = (1 << DDB6);
-	/* Enable SPI */
-	SPCR = (1 << SPE);
+	SPDR = 0xFF;
+	while(!(SPSR & (1<<SPIF)));	/* Wait till reception complete */
+	return(SPDR);			/* Return received data */
 }
-char SPI_Slave_Receive(void)
+
+/* MCP2515 Select (CS Low) */
+void SPI_Select(void) 
 {
-	/* Wait for reception complete */
-	while(!(SPSR & (1 << SPIF)))
-	;
-	/* Return data register */
-	return SPDR;
+	PORTB &= ~(1 << CS_MCP2515);
+}
+
+/* MCP2515 Deselect (CS High) */
+void SPI_Deselect(void) 
+{
+	PORTB |= (1 << CS_MCP2515);
 }

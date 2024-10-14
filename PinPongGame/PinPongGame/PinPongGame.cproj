@@ -142,10 +142,16 @@
     <Compile Include="ADC_driver.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="CAN_connection.c">
+    <Compile Include="CAN_driver.c">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="CAN_connection.h">
+    <Compile Include="CAN_driver.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="SPI_driver.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="SPI_driver.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="CAN_control.c">
