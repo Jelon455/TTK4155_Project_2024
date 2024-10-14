@@ -19,16 +19,22 @@
 #define MCP2515_BIT_MODIFY		0x05
 #define MCP_REQUEST				0x81
 #define MCP2515_RTS				0x80
-#define MCP_CANINTE				0x2B  // Interrupt Enable Register
-#define MCP_RX0IE				0x01  // Enable receive interrupt for RXB0
+/*Interrupt Enable Register*/
+#define MCP_CANINTE				0x2B 
+/*Enable receive interrupt for RXB0*/ 
+#define MCP_RX0IE				0x01  
 
-#define MCP2515_CNF1 0x04  // BRP = 4, SJW = 0 (SJW-1) PROP (10)
-#define MCP2515_CNF2 0xC6  // BTLMODE = 1, PHSEG1 = 5-1, PRSEG = 3-1
-#define MCP2515_CNF3 0x07  // PHSEG2 = 5-1
+/*BRP = 1, SJW = 01*/
+#define MCP2515_CNF1 0x41
+/*BTLMODE = 1, PHSEG1 = 5*/  
+#define MCP2515_CNF2 0x87
+/*PHSEG2 = 5*/  
+#define MCP2515_CNF3 0x07  
 
-#define MCP_CNF1 0x2A  // Configuration Register 1
-#define MCP_CNF2 0x29  // Configuration Register 2
-#define MCP_CNF3 0x28  // Configuration Register 3
+/*Adresses for Configuration Registers*/
+#define MCP_CNF1 0x2A
+#define MCP_CNF2 0x29
+#define MCP_CNF3 0x28
 
 /* === Function declaration === */
 void MCP2515_Init(void);

@@ -15,11 +15,12 @@
 //#include "can_interrupt.h"
 
 
-#define CAN_BR_BRP		21   // Baud Rate Prescaler: BRP = 1
-#define CAN_BR_SJW		1   // Synchronization Jump Width: SJW = 1
-#define CAN_BR_PROP		3   // Propagation Segment: PROPAG = 3
-#define CAN_BR_PHASE1	5  // Phase Segment 1: PHASE1 = 5
-#define CAN_BR_PHASE2	5  // Phase Segment 2: PHASE2 = 5
+/*Defining the  value for CAN_BR*/
+#define CAN_BR_BRP		3   
+#define CAN_BR_SJW		1   
+#define CAN_BR_PROP		1   
+#define CAN_BR_PHASE1	5  
+#define CAN_BR_PHASE2	5 
 
 
 /*Defining the starts point on CAN Baudrate Register CAN_BR*/
