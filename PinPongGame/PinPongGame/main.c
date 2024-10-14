@@ -62,7 +62,7 @@ int main(void)
 	{	
 		printf("Sending CAN message...\n");
 		CAN_Send_Message(&test_message);
-		printf("TEXT MESSAGE %d\n",test_message.data[0]);
+/*		printf("TEXT MESSAGE %d\n",test_message.data[0]);
 		_delay_ms(20);
 		CAN_Message received_message;
 		CAN_Receive_Message(&received_message);
@@ -73,8 +73,7 @@ int main(void)
 			printf("0x%02X ", received_message.data[i]);
 		}
 		printf("\n");
-		
-		_delay_ms(800);
+		*/
 	}
 
 	return 0;

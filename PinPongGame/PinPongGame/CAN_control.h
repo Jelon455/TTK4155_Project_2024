@@ -22,6 +22,14 @@
 #define MCP_CANINTE				0x2B  // Interrupt Enable Register
 #define MCP_RX0IE				0x01  // Enable receive interrupt for RXB0
 
+#define MCP2515_CNF1 0x04  // BRP = 4, SJW = 0 (SJW-1) PROP (10)
+#define MCP2515_CNF2 0xC6  // BTLMODE = 1, PHSEG1 = 5-1, PRSEG = 3-1
+#define MCP2515_CNF3 0x07  // PHSEG2 = 5-1
+
+#define MCP_CNF1 0x2A  // Configuration Register 1
+#define MCP_CNF2 0x29  // Configuration Register 2
+#define MCP_CNF3 0x28  // Configuration Register 3
+
 /* === Function declaration === */
 void MCP2515_Init(void);
 void MCP2515_Reset(void);

@@ -9,7 +9,7 @@ void CAN_Init(void)
 {
     MCP2515_Init();
     /*Set loopback mode (CANCTRL Mode bits = 010)*/
-    MCP2515_Bit_Modify(MCP_CANCTRL, 0xE0, MODE_LOOPBACK);
+    MCP2515_Bit_Modify(MCP_CANCTRL, 0xE0, MODE_NORMAL);
     /*Enable interrupts for receiving messages in RXB0*/
     MCP2515_Write(MCP_CANINTE, 0x01); 
 }

@@ -40,9 +40,9 @@ typedef struct
 	/*Standard Identifier*/
 	uint16_t id;
 	/*Data length*/
-	uint8_t length;
+	char length;
 	/*Data array*/
-	uint8_t data[8];
+	char data[8];
 }
 CAN_Message;
 
