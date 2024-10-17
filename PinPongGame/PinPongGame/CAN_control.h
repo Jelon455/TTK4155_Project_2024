@@ -25,9 +25,9 @@
 #define MCP_RX0IE				0x01  
 
 /*BRP = 1, SJW = 01*/
-#define MCP2515_CNF1 0x41
+#define MCP2515_CNF1 0xC1
 /*BTLMODE = 1, PHSEG1 = 1*/  
-#define MCP2515_CNF2 0x89
+#define MCP2515_CNF2 0x8A
 /*PHSEG2 = 1*/  
 #define MCP2515_CNF3 0x01  
 

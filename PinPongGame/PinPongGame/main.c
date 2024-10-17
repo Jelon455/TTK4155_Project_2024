@@ -63,18 +63,17 @@ int main(void)
 		printf("HELLO I am NODE 1! Sending CAN message...\n");
 		CAN_Send_Message(&test_message);
 		_delay_ms(100);
-/*		printf("TEXT MESSAGE %d\n",test_message.data[0]);
-		_delay_ms(20);
-		CAN_Message received_message;
+//		printf("TEXT MESSAGE %d\n",test_message.data[0]);
+/*		_delay_ms(20);
+		CanMsg received_message;
 		CAN_Receive_Message(&received_message);
 		printf("Received CAN message with ID: 0x%03X\n", received_message.id);
 		printf("Data: ");
 		for (uint8_t i = 0; i < received_message.length; i++)
 		{
-			printf("0x%02X ", received_message.data[i]);
+			printf("0x%02X ", received_message.byte[i]);
 		}
-		printf("\n");
-		*/
+		printf("\n");*/
 	}
 
 	return 0;

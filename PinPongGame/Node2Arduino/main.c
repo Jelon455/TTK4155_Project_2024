@@ -15,8 +15,8 @@
 
 /*Defining the  value for CAN_BR DATASHEET: page 1193*/
 #define BR_BRP	20   
-#define BR_SJW	1   
-#define BR_PROP		1   
+#define BR_SJW	3   
+#define BR_PROP		2   
 #define BR_PHASE1	1  
 #define BR_PHASE2	1 
 
@@ -40,15 +40,25 @@ int main(void)
 	canInit.sjw = BR_SJW;      
 	canInit.brp = BR_BRP;      
 	canInit.smp = 0;
-	
     /* Initialize CAN with predefined timing */
     can_init(canInit, 0);
-
+	
+	CanMsg test_message;
+	test_message.id = 0x15;
+	test_message.length = 8;
+	test_message.byte[0] = 0x11;
+	test_message.byte[1] = 0x22;
+	test_message.byte[2] = 0x33;
+	test_message.byte[3] = 0x44;
+	test_message.byte[4] = 0x55;
+	test_message.byte[5] = 0x66;
+	test_message.byte[6] = 0x77;
+	test_message.byte[7] = 0x88;
     while (1) 
     {
 		printf("HELLO I am NODE 2!\n\r");
-		CanMsg received_message;
-		can_rx(&received_message);
-		can_printmsg(received_message);
+		can_rx(&test_message);
+		can_printmsg(test_message);
+
     }
 }
