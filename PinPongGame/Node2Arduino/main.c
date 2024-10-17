@@ -11,51 +11,44 @@
 
 #include "sam.h"
 #include "uart.h"
-#include "can_controller.h"
-//#include "can_interrupt.h"
+#include "can.h"
 
-
-/*Defining the  value for CAN_BR*/
-#define CAN_BR_BRP		3   
-#define CAN_BR_SJW		1   
-#define CAN_BR_PROP		1   
-#define CAN_BR_PHASE1	5  
-#define CAN_BR_PHASE2	5 
+/*Defining the  value for CAN_BR DATASHEET: page 1193*/
+#define BR_BRP	20   
+#define BR_SJW	1   
+#define BR_PROP		1   
+#define BR_PHASE1	1  
+#define BR_PHASE2	1 
 
 
 /*Defining the starts point on CAN Baudrate Register CAN_BR*/
-#define CAN_BR_BRP_Pos		16
-#define CAN_BR_SJW_Pos		12
-#define CAN_BR_PROPAG_Pos	8
-#define CAN_BR_PHASE1_Pos	4
-#define CAN_BR_PHASE2_Pos	0
+#define BR_BRP_Pos		16
+#define BR_SJW_Pos		12
+#define BR_PROPAG_Pos	8
+#define BR_PHASE1_Pos	4
+#define BR_PHASE2_Pos	0
 
-	 
 int main(void)
 {
     SystemInit();
 	uart_init(FOCS, BAUND);
-	/* Set the CAN bit timing using the CAN_BR register */
-	uint32_t can_br =	(CAN_BR_BRP << CAN_BR_BRP_Pos) |
-						(CAN_BR_SJW << CAN_BR_SJW_Pos) |
-						(CAN_BR_PROP << CAN_BR_PROPAG_Pos) |
-						(CAN_BR_PHASE1 << CAN_BR_PHASE1_Pos) |
-						(CAN_BR_PHASE2 << CAN_BR_PHASE2_Pos);
-    
+	CanInit canInit;
+
+	canInit.phase2 = BR_PHASE2;
+	canInit.propag = BR_PROP;  
+	canInit.phase1 = BR_PHASE1;
+	canInit.sjw = BR_SJW;      
+	canInit.brp = BR_BRP;      
+	canInit.smp = 0;
+	
     /* Initialize CAN with predefined timing */
-    can_init_def_tx_rx_mb(can_br);
+    can_init(canInit, 0);
 
     while (1) 
     {
-		printf("HELLO\n\r");
-		CAN_MESSAGE received_message;
-		can_receive(&received_message,2);
-		printf("Received CAN message with ID: 0x%03X\n", received_message.id);
-		printf("Data: ");
-		for (uint8_t i = 0; i < received_message.data_length; i++)
-		{
-			printf("0x%02X ", received_message.data[i]);
-		}
-		printf("\n");
+		printf("HELLO I am NODE 2!\n\r");
+		CanMsg received_message;
+		can_rx(&received_message);
+		can_printmsg(received_message);
     }
 }

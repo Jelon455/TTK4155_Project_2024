@@ -143,16 +143,10 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="can_controller.c">
+    <Compile Include="can.c">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="can_controller.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="can_interrupt.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="can_interrupt.h">
+    <Compile Include="can.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="Device_Startup\startup_sam3xa.c">

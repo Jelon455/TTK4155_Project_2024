@@ -38,8 +38,7 @@ SUBDIRS :=  \
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS +=  \
-../can_controller.c \
-../can_interrupt.c \
+../can.c \
 ../Device_Startup/startup_sam3xa.c \
 ../Device_Startup/system_sam3xa.c \
 ../main.c \
@@ -54,8 +53,7 @@ ASM_SRCS +=
 
 
 OBJS +=  \
-can_controller.o \
-can_interrupt.o \
+can.o \
 Device_Startup/startup_sam3xa.o \
 Device_Startup/system_sam3xa.o \
 main.o \
@@ -63,8 +61,7 @@ time.o \
 uart.o
 
 OBJS_AS_ARGS +=  \
-can_controller.o \
-can_interrupt.o \
+can.o \
 Device_Startup/startup_sam3xa.o \
 Device_Startup/system_sam3xa.o \
 main.o \
@@ -72,8 +69,7 @@ time.o \
 uart.o
 
 C_DEPS +=  \
-can_controller.d \
-can_interrupt.d \
+can.d \
 Device_Startup/startup_sam3xa.d \
 Device_Startup/system_sam3xa.d \
 main.d \
@@ -81,8 +77,7 @@ time.d \
 uart.d
 
 C_DEPS_AS_ARGS +=  \
-can_controller.d \
-can_interrupt.d \
+can.d \
 Device_Startup/startup_sam3xa.d \
 Device_Startup/system_sam3xa.d \
 main.d \
@@ -107,14 +102,7 @@ LINKER_SCRIPT_DEP+=  \
 
 
 # AVR32/GNU C Compiler
-./can_controller.o: .././can_controller.c
-	@echo Building file: $<
-	@echo Invoking: ARM/GNU C Compiler : 6.3.1
-	$(QUOTE)D:\Atmel\7.0\toolchain\arm\arm-gnu-toolchain\bin\arm-none-eabi-gcc.exe$(QUOTE)  -x c -mthumb -D__SAM3X8E__ -DDEBUG  -I"D:\Atmel\7.0\Packs\arm\CMSIS\5.4.0\CMSIS\Core\Include" -I"D:\Atmel\7.0\Packs\atmel\SAM3X_DFP\1.0.50\include"  -Og -ffunction-sections -mlong-calls -g3 -Wall -mcpu=cortex-m3 -c -std=gnu99 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
-	@echo Finished building: $<
-	
-
-./can_interrupt.o: .././can_interrupt.c
+./can.o: .././can.c
 	@echo Building file: $<
 	@echo Invoking: ARM/GNU C Compiler : 6.3.1
 	$(QUOTE)D:\Atmel\7.0\toolchain\arm\arm-gnu-toolchain\bin\arm-none-eabi-gcc.exe$(QUOTE)  -x c -mthumb -D__SAM3X8E__ -DDEBUG  -I"D:\Atmel\7.0\Packs\arm\CMSIS\5.4.0\CMSIS\Core\Include" -I"D:\Atmel\7.0\Packs\atmel\SAM3X_DFP\1.0.50\include"  -Og -ffunction-sections -mlong-calls -g3 -Wall -mcpu=cortex-m3 -c -std=gnu99 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 

@@ -26,10 +26,10 @@
 
 /*BRP = 1, SJW = 01*/
 #define MCP2515_CNF1 0x41
-/*BTLMODE = 1, PHSEG1 = 5*/  
-#define MCP2515_CNF2 0x87
-/*PHSEG2 = 5*/  
-#define MCP2515_CNF3 0x07  
+/*BTLMODE = 1, PHSEG1 = 1*/  
+#define MCP2515_CNF2 0x89
+/*PHSEG2 = 1*/  
+#define MCP2515_CNF3 0x01  
 
 /*Adresses for Configuration Registers*/
 #define MCP_CNF1 0x2A

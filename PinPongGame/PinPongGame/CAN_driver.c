@@ -15,7 +15,7 @@ void CAN_Init(void)
 }
 
 /* CAN Message Sending Function */
-void CAN_Send_Message(CAN_Message* msg)
+void CAN_Send_Message(CanMsg* msg)
 {
     /*Set the standard ID (11-bit) in TXB0SIDH and TXB0SIDL*/
     MCP2515_Write(MCP_TXB0SIDH, (msg->id >> 3) & 0xFF);
@@ -26,13 +26,13 @@ void CAN_Send_Message(CAN_Message* msg)
     /*Write the data bytes to TXB0*/
     for (uint8_t i = 0; i < msg->length; i++) 
 	{
-        MCP2515_Write(MCP_TXB0D0 + i, msg->data[i]);
+        MCP2515_Write(MCP_TXB0D0 + i, msg->byte[i]);
     }
     /*Request to send the message via TXB0*/
     MCP2515_Request_Send(0x01);
 }
 
-uint8_t CAN_Receive_Message(CAN_Message* msg)
+uint8_t CAN_Receive_Message(CanMsg* msg)
 {
     /*Check if there's a message in RXB0*/
     uint8_t canintf = MCP2515_Read(MCP_CANINTF);
@@ -50,7 +50,7 @@ uint8_t CAN_Receive_Message(CAN_Message* msg)
     /*Read the data bytes from RXB0*/
     for (uint8_t i = 0; i < msg->length; i++) 
 	{
-        msg->data[i] = MCP2515_Read(MCP_RXB0D0 + i);
+        msg->byte[i] = MCP2515_Read(MCP_RXB0D0 + i);
     }
     /*Clear the RX0IF flag to indicate the message was received*/
     MCP2515_Bit_Modify(MCP_CANINTF, MCP_RX0IF, 0);

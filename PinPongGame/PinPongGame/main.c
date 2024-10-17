@@ -46,22 +46,23 @@ int main(void)
 	_delay_ms(20);
 	
 	/*making CAN message*/
-	CAN_Message test_message;
-	test_message.id = 0x122;
+	CanMsg test_message;
+	test_message.id = 0x15;
 	test_message.length = 8;
-	test_message.data[0] = 0x11;
-	test_message.data[1] = 0x22;
-	test_message.data[2] = 0x33;
-	test_message.data[3] = 0x44;
-	test_message.data[4] = 0x55;
-	test_message.data[5] = 0x66;
-	test_message.data[6] = 0x77;
-	test_message.data[7] = 0xBB;
+	test_message.byte[0] = 0x11;
+	test_message.byte[1] = 0x22;
+	test_message.byte[2] = 0x33;
+	test_message.byte[3] = 0x44;
+	test_message.byte[4] = 0x55;
+	test_message.byte[5] = 0x66;
+	test_message.byte[6] = 0x77;
+	test_message.byte[7] = 0x88;
 	
 	while (1)
 	{	
-		printf("Sending CAN message...\n");
+		printf("HELLO I am NODE 1! Sending CAN message...\n");
 		CAN_Send_Message(&test_message);
+		_delay_ms(100);
 /*		printf("TEXT MESSAGE %d\n",test_message.data[0]);
 		_delay_ms(20);
 		CAN_Message received_message;

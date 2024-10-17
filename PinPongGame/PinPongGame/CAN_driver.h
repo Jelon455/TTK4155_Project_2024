@@ -35,20 +35,25 @@
 #define MODE_LOOPBACK		0x40  // Loopback mode (CANCTRL register bits 5-7 set to 010
 #define MCP_RX0IF           0x01  // RX Buffer 0 Full Interrupt Flag
 
-typedef struct
-{
-	/*Standard Identifier*/
-	uint16_t id;
-	/*Data length*/
-	char length;
-	/*Data array*/
-	char data[8];
-}
-CAN_Message;
+typedef struct Byte8 Byte8;
+struct Byte8 {
+	uint8_t bytes[8];
+};
+
+typedef struct CanMsg CanMsg;
+struct CanMsg {
+	uint8_t id;
+	uint8_t length;
+	union {
+		uint8_t     byte[8];
+		uint32_t    dword[2];
+		Byte8       byte8;
+	};
+};
 
 /* === Function declaration === */
 void CAN_Init(void);
-uint8_t CAN_Receive_Message(CAN_Message* msg);
-void CAN_Send_Message(CAN_Message* msg);
+uint8_t CAN_Receive_Message(CanMsg* msg);
+void CAN_Send_Message(CanMsg* msg);
 
 #endif /* CAN_DRIVER_H_ */
