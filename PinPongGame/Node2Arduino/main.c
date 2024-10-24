@@ -12,6 +12,7 @@
 #include "sam.h"
 #include "uart.h"
 #include "can.h"
+#include "pwm.h"
 
 /*Defining the  value for CAN_BR DATASHEET: page 1193*/
 #define BR_BRP	20   
@@ -31,7 +32,12 @@
 int main(void)
 {
     SystemInit();
+    WDT->WDT_MR = WDT_MR_WDDIS;        // Disable Watchdog Timer
+	PMC->PMC_WPMR &= ~(PMC_WPMR_WPEN); // PMC enable
 	uart_init(FOCS, BAUND);
+	
+	pwm_init();
+    double duty_cycle = 0.045;
 	CanInit canInit;
 
 	canInit.phase2 = BR_PHASE2;
@@ -59,6 +65,13 @@ int main(void)
 		printf("HELLO I am NODE 2!\n\r");
 		can_rx(&test_message);
 		can_printmsg(test_message);
+        
+		if (duty_cycle >= 0.105)
+        {
+	        duty_cycle = 0.45;
+        }
+        duty_cycle++;
+        pwm_set_duty_cycle(duty_cycle);
 
     }
 }
