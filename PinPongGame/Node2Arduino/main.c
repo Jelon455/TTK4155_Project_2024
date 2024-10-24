@@ -36,7 +36,7 @@ int main(void)
 	PMC->PMC_WPMR &= ~(PMC_WPMR_WPEN); // PMC enable
 	uart_init(FOCS, BAUND);
 	
-	pwm_init();
+	PWM_Init();
     double duty_cycle = 0.045;
 	CanInit canInit;
 
@@ -64,14 +64,16 @@ int main(void)
     {
 		printf("HELLO I am NODE 2!\n\r");
 		can_rx(&test_message);
-		can_printmsg(test_message);
+//		can_printmsg(test_message);
         
+		
 		if (duty_cycle >= 0.105)
         {
-	        duty_cycle = 0.45;
+	        duty_cycle = 0.045;
         }
-        duty_cycle++;
-        pwm_set_duty_cycle(duty_cycle);
-
+		PWM_Set_Duty_Cycle(duty_cycle);
+       // duty_cycle = duty_cycle + 0.05;
+		printf("duty cycle = %f\n\r", duty_cycle);
+		
     }
 }
