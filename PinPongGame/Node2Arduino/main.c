@@ -64,6 +64,7 @@ int main(void) {
 
 			printf("Setting duty cycle based on joystick: %f\n", duty_cycle);
 			PWM_Set_Duty_Cycle(duty_cycle);
+			for(volatile int i = 0; i < 100000; i++);
 		}
 	}
 }
