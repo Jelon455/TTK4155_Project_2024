@@ -35,52 +35,35 @@
 
 #define MIN_DUTY_CYCLE  (0.9 / 20)
 #define MAX_DUTY_CYCLE  (2.1 / 20)
+#define RANGE_DUTY_CYCLE (MAX_DUTY_CYCLE - MIN_DUTY_CYCLE)
 
-int main(void)
+/*Function to map joystick data to duty cycle*/
+double map_joystick_to_duty_cycle(uint8_t joystick_value) 
 {
-    SystemInit();
-    WDT->WDT_MR = WDT_MR_WDDIS;        // Disable Watchdog Timer
+	return MIN_DUTY_CYCLE + (RANGE_DUTY_CYCLE * (joystick_value / 255.0));
+}
+
+int main(void) {
+	SystemInit();
+	WDT->WDT_MR = WDT_MR_WDDIS; // Disable Watchdog Timer
 	uart_init(FOCS, BAUND);
 
+	CanInit canInit = { .phase2 = BR_PHASE2, .propag = BR_PROP, .phase1 = BR_PHASE1, .sjw = BR_SJW, .brp = BR_BRP, .smp = 0 };
+	can_init(canInit, 0);
 
-    double duty_cycle = 0.045;
-	CanInit canInit;
-	canInit.phase2 = BR_PHASE2;
-	canInit.propag = BR_PROP;  
-	canInit.phase1 = BR_PHASE1;
-	canInit.sjw = BR_SJW;      
-	canInit.brp = BR_BRP;      
-	canInit.smp = 0;
-    /* Initialize CAN with predefined timing */
-    can_init(canInit, 0);
-	
-	CanMsg test_message;
-	test_message.id = 0x15;
-	test_message.length = 8;
-	test_message.byte[0] = 0x11;
-	test_message.byte[1] = 0x22;
-	test_message.byte[2] = 0x33;
-	test_message.byte[3] = 0x44;
-	test_message.byte[4] = 0x55;
-	test_message.byte[5] = 0x66;
-	test_message.byte[6] = 0x77;
-	test_message.byte[7] = 0x88;
 	PWM_Init();
-    while (1) 
-    {
-//		printf("HELLO I am NODE 2!\n\r");
-//		can_rx(&test_message);
-//		can_printmsg(test_message);
-  		if (duty_cycle >= 0.105)
-        {
-	        duty_cycle = 0.045;
-        }
-		PWM_Set_Duty_Cycle(duty_cycle);
-		/*increase the duty cycle*/
-		duty_cycle = duty_cycle + 0.01;
-		/*delay*/
-		for(volatile int i = 0; i < 1000000; i++);
-		printf("duty cycle = %lu\n\r", CPRD);
-		
-    }
+	while (1) {
+		printf("Hello I am node 2! \r\n");
+		// Create a structure to store the received CAN message
+		CanMsg joystick_message;
+		can_rx(&joystick_message);
+		can_printmsg(joystick_message);
+		if (can_rx(&joystick_message) && joystick_message.id == 0x22) {
+			uint8_t joystick_x = joystick_message.byte[0];  // Read x-axis position from CAN message
+			double duty_cycle = map_joystick_to_duty_cycle(joystick_x);
+
+			printf("Setting duty cycle based on joystick: %f\n", duty_cycle);
+			PWM_Set_Duty_Cycle(duty_cycle);
+		}
+	}
 }

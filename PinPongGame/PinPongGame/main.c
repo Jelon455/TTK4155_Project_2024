@@ -30,55 +30,40 @@ int selected_page = 0;
 int in_subpage = 0;
 
 
-int main(void) 
-{
+int main(void) {
 	Init();
 	USART_Init(UBBR);
 	Init_ADC();
-
 	FILE *uart_stream = fdevopen(USART_Transmit_Char, USART_Receive_Char);
-	
 	stdout = uart_stream;
 	stdin = uart_stream;
 
 	SPI_Init();
 	CAN_Init();
 	_delay_ms(20);
+
+	// Initialize joystick calibration
+	calibration = Calibrate_Joystick();
+	CanMsg joystick_message;
+	joystick_message.id = 0x22; // Set CAN ID for joystick message
+	joystick_message.length = 1; // Only sending x-axis
+	joystick_message.byte[0] = 0x00;
 	
-	/*making CAN message*/
-	CanMsg test_message;
-	test_message.id = 0x15;
-	test_message.length = 8;
-	test_message.byte[0] = 0x11;
-	test_message.byte[1] = 0x22;
-	test_message.byte[2] = 0x33;
-	test_message.byte[3] = 0x44;
-	test_message.byte[4] = 0x55;
-	test_message.byte[5] = 0x66;
-	test_message.byte[6] = 0x77;
-	test_message.byte[7] = 0x88;
-	
-	while (1)
-	{	
-		printf("HELLO I am NODE 1! Sending CAN message...\n");
-		CAN_Send_Message(&test_message);
-		_delay_ms(100);
-//		printf("TEXT MESSAGE %d\n",test_message.data[0]);
-/*		_delay_ms(20);
-		CanMsg received_message;
-		CAN_Receive_Message(&received_message);
-		printf("Received CAN message with ID: 0x%03X\n", received_message.id);
-		printf("Data: ");
-		for (uint8_t i = 0; i < received_message.length; i++)
-		{
-			printf("0x%02X ", received_message.byte[i]);
-		}
-		printf("\n");*/
+	while (1) {
+		// Get joystick position
+		printf("Hello I am node 1! \r\n");
+		JoystickPosition joystick_pos = Get_Joystick_Position(calibration);
+
+		// Prepare CAN message based on joystick x-axis data
+
+		// raw joystic pos
+		joystick_message.byte[0] = ADC_Read(ADC_CHANNEL_X);
+
+		printf("Sending joystick x position: %d\n", joystick_message.byte[0]);
+		CAN_Send_Message(&joystick_message);
+
+		_delay_ms(200); // Send updates every 100 ms
 	}
 
 	return 0;
 }
-
-
-
-
