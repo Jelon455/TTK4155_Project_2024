@@ -29,17 +29,22 @@
 #define BR_PHASE1_Pos	4
 #define BR_PHASE2_Pos	0
 
+#define F_CHANNEL_1_CLOCK  (CHIP_FREQ_CPU_MAX / 1024)
+#define PERIOD (20.0 / 1000)
+#define CPRD  ((uint32_t)(PERIOD * F_CHANNEL_1_CLOCK))
+
+#define MIN_DUTY_CYCLE  (0.9 / 20)
+#define MAX_DUTY_CYCLE  (2.1 / 20)
+
 int main(void)
 {
     SystemInit();
     WDT->WDT_MR = WDT_MR_WDDIS;        // Disable Watchdog Timer
-	PMC->PMC_WPMR &= ~(PMC_WPMR_WPEN); // PMC enable
 	uart_init(FOCS, BAUND);
-	
-	PWM_Init();
+
+
     double duty_cycle = 0.045;
 	CanInit canInit;
-
 	canInit.phase2 = BR_PHASE2;
 	canInit.propag = BR_PROP;  
 	canInit.phase1 = BR_PHASE1;
@@ -60,20 +65,22 @@ int main(void)
 	test_message.byte[5] = 0x66;
 	test_message.byte[6] = 0x77;
 	test_message.byte[7] = 0x88;
+	PWM_Init();
     while (1) 
     {
-		printf("HELLO I am NODE 2!\n\r");
-		can_rx(&test_message);
+//		printf("HELLO I am NODE 2!\n\r");
+//		can_rx(&test_message);
 //		can_printmsg(test_message);
-        
-		
-		if (duty_cycle >= 0.105)
+  		if (duty_cycle >= 0.105)
         {
 	        duty_cycle = 0.045;
         }
 		PWM_Set_Duty_Cycle(duty_cycle);
-       // duty_cycle = duty_cycle + 0.05;
-		printf("duty cycle = %f\n\r", duty_cycle);
+		/*increase the duty cycle*/
+		duty_cycle = duty_cycle + 0.01;
+		/*delay*/
+		for(volatile int i = 0; i < 1000000; i++);
+		printf("duty cycle = %lu\n\r", CPRD);
 		
     }
 }
