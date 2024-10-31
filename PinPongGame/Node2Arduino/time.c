@@ -24,9 +24,9 @@ __attribute__((constructor)) void time_init(void){
 }    
 
 
-void SysTick_Handler(void){
+/*void SysTick_Handler(void){
     now += calib;
-}
+}*/
 
 
 uint64_t time_now(void){
