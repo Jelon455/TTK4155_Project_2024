@@ -63,6 +63,7 @@ int main(void) {
 		CAN_Send_Message(&joystick_message);
 
 		_delay_ms(200); // Send updates every 100 ms
+		
 	}
 
 	return 0;

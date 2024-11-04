@@ -155,6 +155,12 @@
     <Compile Include="Device_Startup\system_sam3xa.c">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="IR_driver.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="IR_driver.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="main.c">
       <SubType>compile</SubType>
     </Compile>
@@ -181,9 +187,6 @@
     <Folder Include="Device_Startup\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Device_Startup\sam3x8e_flash.ld">
-      <SubType>compile</SubType>
-    </None>
     <None Include="Device_Startup\sam3x8e_sram.ld">
       <SubType>compile</SubType>
     </None>
