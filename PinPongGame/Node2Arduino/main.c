@@ -14,6 +14,7 @@
 #include "can.h"
 #include "pwm.h"
 #include "IR_driver.h"
+#include "Motor_driver.h"
 
 /*Defining the  value for CAN_BR DATASHEET: page 1193*/
 #define BR_BRP		20   
@@ -61,6 +62,7 @@ int main(void)
 	init_pin_pd9_as_input();
 	SysTick_Init();
 	IR_ADC_Init();
+	Encoder_Init();
 	uint8_t last_state = 0;
 	uint8_t bounce_count = 0;
 	uint8_t current_state = 0;
@@ -88,6 +90,7 @@ int main(void)
 			printf("duty_cycle: %f! \r\n", duty_cycle);
 		}
 		printf("Hello I am node 2! \r\n");
+		printf("ENCODER POSITION %lu\r\n", Get_Encoder_Position());
 	}
 
 }
