@@ -58,10 +58,15 @@ int main(void)
 	can_init(canInit, 0);
 
 	PWM_Init();
+	
 	Pin_PD10_Init();
+	
 	init_pin_pd9_as_input();
+	
 	SysTick_Init();
+	
 	IR_ADC_Init();
+	
 	Encoder_Init();
 	uint8_t last_state = 0;
 	uint8_t bounce_count = 0;
@@ -99,6 +104,7 @@ int read_pin_pd9(void)
 {
 	return (PIOD->PIO_PDSR & PIO_PDSR_P9) ? 1 : 0;
 }
+
 /*Function to map joystick data to duty cycle*/
 double map_joystick_to_duty_cycle(uint8_t adc_value)
 {
