@@ -34,35 +34,32 @@ int main(void) {
 	Init();
 	USART_Init(UBBR);
 	Init_ADC();
+	_delay_ms(20);
 	FILE *uart_stream = fdevopen(USART_Transmit_Char, USART_Receive_Char);
 	stdout = uart_stream;
 	stdin = uart_stream;
 
 	SPI_Init();
 	CAN_Init();
-	_delay_ms(20);
 
-	// Initialize joystick calibration
 	calibration = Calibrate_Joystick();
 	CanMsg joystick_message;
-	joystick_message.id = 0x22; // Set CAN ID for joystick message
-	joystick_message.length = 1; // Only sending x-axis
+	
+	joystick_message.id = 0x22;
+	joystick_message.length = 1;
 	joystick_message.byte[0] = 0x00;
 	
-	while (1) {
-		// Get joystick position
-		printf("Hello I am node 1! \r\n");
-		JoystickPosition joystick_pos = Get_Joystick_Position(calibration);
+	printf("Hello I am node 1! \r\n");
+	while (1) 
+	{
+		//JoystickPosition joystick_pos = Get_Joystick_Position(calibration);
 
-		// Prepare CAN message based on joystick x-axis data
-
-		// raw joystic pos
 		joystick_message.byte[0] = ADC_Read(ADC_CHANNEL_X);
 
 		printf("Sending joystick x position: %d\n", joystick_message.byte[0]);
 		CAN_Send_Message(&joystick_message);
 
-		_delay_ms(200); // Send updates every 100 ms
+		_delay_ms(100);
 		
 	}
 

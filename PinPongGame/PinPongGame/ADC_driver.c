@@ -33,7 +33,6 @@ JoystickCalibration Calibrate_Joystick(void)
 	_delay_ms(20);
 	printf("Step 1: Setting NEUTRAL position: Do not move the joystick.\n");
 	printf("Wait 2 second!");
-//	_delay_ms(1000);
 
 	for (uint16_t i = 0; i < num_samples; i++)
 	{
@@ -107,7 +106,7 @@ JoystickPosition Get_Joystick_Position(JoystickCalibration calibration)
 	int16_t adc_x = (int16_t)ADC_Read(ADC_CHANNEL_X);
 	_delay_ms(2);
 	int16_t adc_y = (int16_t)ADC_Read(ADC_CHANNEL_Y);
-	
+	_delay_ms(2);
 	int16_t adc_x_calibrated = adc_x - calibration.x_offset;
 	int16_t adc_y_calibrated = adc_y - calibration.y_offset;
 	

@@ -16,8 +16,8 @@
 #include "IR_driver.h"
 
 /*Defining the  value for CAN_BR DATASHEET: page 1193*/
-#define BR_BRP	20   
-#define BR_SJW	3   
+#define BR_BRP		20   
+#define BR_SJW		3   
 #define BR_PROP		2   
 #define BR_PHASE1	1  
 #define BR_PHASE2	1 
@@ -34,9 +34,9 @@
 #define PERIOD (20.0 / 1000)
 #define CPRD  ((uint32_t)(PERIOD * F_CHANNEL_1_CLOCK))
 
-#define MIN_DUTY_CYCLE  (0.9 / 20)
-#define MAX_DUTY_CYCLE  (2.1 / 20)
-#define RANGE_DUTY_CYCLE (MAX_DUTY_CYCLE - MIN_DUTY_CYCLE) //1,2ms
+#define MIN_DUTY_CYCLE  (0.9 / 20) //0,045
+#define MAX_DUTY_CYCLE  (2.1 / 20) //0,105
+#define RANGE_DUTY_CYCLE (MAX_DUTY_CYCLE - MIN_DUTY_CYCLE) //0,06
 
 void SysTick_Init(void);
 void SysTick_Handler(void);
@@ -46,12 +46,11 @@ void init_pin_pd9_as_input(void);
 int read_pin_pd9(void);
 
 static double duty_cycle = MIN_DUTY_CYCLE;
-volatile uint8_t toggle_flag = 0;
 
 int main(void) 
 {
 	SystemInit();
-	WDT->WDT_MR = WDT_MR_WDDIS; // Disable Watchdog Timer
+	WDT->WDT_MR = WDT_MR_WDDIS;
 	uart_init(FOCS, BAUND);
 
 	CanInit canInit = { .phase2 = BR_PHASE2, .propag = BR_PROP, .phase1 = BR_PHASE1, .sjw = BR_SJW, .brp = BR_BRP, .smp = 0 };
@@ -62,53 +61,45 @@ int main(void)
 	init_pin_pd9_as_input();
 	SysTick_Init();
 	IR_ADC_Init();
-	uint32_t  value =0;
-	uint8_t last_state = 0;       // Poprzedni stan wejœcia
-	uint8_t stable_state = 0;     // Stabilny stan po debouncowaniu
-	uint32_t point_count = 0; // Licznik punktów (zmian z 0 na 1)
-	uint8_t bounce_count = 0; // Licznik odbiæ (wszystkich zmian stanu)
+	uint8_t last_state = 0;
+	uint8_t bounce_count = 0;
 	uint8_t current_state = 0;
 	while (1) 
 	{
 		current_state = read_pin_pd9();
 		CanMsg joystick_message;
 		can_rx(&joystick_message);
-//		printf("Message id 0x%x\r\n",joystick_message.id);
-//		printf("Message: %d\r\n",joystick_message.byte[0]);
-		for (volatile int i = 0; i<1000000;i++);
-		// Sprawdzamy, czy stan pinu siê zmieni³
+		printf("Message id 0x%x\r\n",joystick_message.id);
+		printf("Message: %d\r\n",joystick_message.byte[0]);
+		for (volatile int i = 0; i<500000;i++);
 
-		// SprawdŸ, czy stan pinu siê zmieni³
 		if ((current_state != last_state) && current_state == 0) 
 		{
 			bounce_count++;
 			for (volatile int i = 0; i<100;i++);
 		}
 		last_state = current_state;
-		printf("SCORE: %d\n", bounce_count);
+		printf("!!!!!!!!!!!!!!! SCORE:    %d    !!!!!!!!!!!!!!!!!\n", bounce_count);
 		
 		if ((joystick_message.id == 0x22)) 
 		{
 			uint8_t joystick_x = joystick_message.byte[0];
 			duty_cycle = map_joystick_to_duty_cycle(joystick_x);
+			printf("duty_cycle: %f! \r\n", duty_cycle);
 		}
-		value = IR_ADC_Read();
 		printf("Hello I am node 2! \r\n");
-		printf("ADC: %lu\n\r", value);
 	}
 
 }
 
 int read_pin_pd9(void) 
 {
-	// Odczytujemy stan pinu PD9
 	return (PIOD->PIO_PDSR & PIO_PDSR_P9) ? 1 : 0;
 }
 /*Function to map joystick data to duty cycle*/
-double map_joystick_to_duty_cycle(uint8_t normalized_value)
+double map_joystick_to_duty_cycle(uint8_t adc_value)
 {
-    // Map normalized value to the duty cycle range
-    return MIN_DUTY_CYCLE + (RANGE_DUTY_CYCLE * normalized_value);
+    return MIN_DUTY_CYCLE + (RANGE_DUTY_CYCLE * ((double)adc_value/255.0));
 }
 
 void SysTick_Init(void)
@@ -127,17 +118,7 @@ void SysTick_Init(void)
 // Interrupt handler for SysTick
 void SysTick_Handler(void)
 {
-	//printf("\n\r Setting duty cycle based on joystick: %f\n\r", duty_cycle);
-	PWM_Set_Duty_Cycle(duty_cycle);   
-	if (toggle_flag) 
-	{
-		PIOD->PIO_SODR = PIO_SODR_P10; // Ustaw PD10 na wysoki
-	} 
-	else 
-	{
-		PIOD->PIO_CODR = PIO_CODR_P10; // Ustaw PD10 na niski
-	}
-	toggle_flag = !toggle_flag; // Prze³¹cz flagê		
+	PWM_Set_Duty_Cycle(duty_cycle); 	
 }
 
 
