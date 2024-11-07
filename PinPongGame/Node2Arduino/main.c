@@ -59,8 +59,6 @@ int main(void)
 
 	PWM_Init();
 	
-	Pin_PD10_Init();
-	
 	init_pin_pd9_as_input();
 	
 	SysTick_Init();
@@ -68,9 +66,13 @@ int main(void)
 	IR_ADC_Init();
 	
 	Encoder_Init();
+
+	
 	uint8_t last_state = 0;
 	uint8_t bounce_count = 0;
 	uint8_t current_state = 0;
+	int32_t encoder_value = 1;
+	
 	while (1) 
 	{
 		current_state = read_pin_pd9();
@@ -95,7 +97,8 @@ int main(void)
 			printf("duty_cycle: %f! \r\n", duty_cycle);
 		}
 		printf("Hello I am node 2! \r\n");
-		printf("ENCODER POSITION %lu\r\n", Get_Encoder_Position());
+		encoder_value = Get_Encoder_Position();
+		printf("ENCODER POSITION %lu\r\n", encoder_value);
 	}
 
 }
@@ -128,18 +131,6 @@ void SysTick_Init(void)
 void SysTick_Handler(void)
 {
 	PWM_Set_Duty_Cycle(duty_cycle); 	
-}
-
-
-void Pin_PD10_Init(void)
- {
-	// W³¹cz zegar dla portu D
-	PMC->PMC_PCER0 |= PMC_PCER0_PID14; // ID_PIOD to identyfikator PIOD
-
-	// Ustaw PD10 jako wyjœcie
-	PIOD->PIO_PER = PIO_PER_P10;      // W³¹cz kontrolê nad PD10
-	PIOD->PIO_OER = PIO_OER_P10;      // Ustaw PD10 jako wyjœcie
-	PIOD->PIO_CODR = PIO_CODR_P10;    // Ustaw pocz¹tkowo na niski stan
 }
 
 void init_pin_pd9_as_input(void) 
