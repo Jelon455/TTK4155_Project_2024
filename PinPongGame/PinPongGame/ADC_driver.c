@@ -98,6 +98,11 @@ JoystickCalibration Calibrate_Joystick(void)
 	return calibration;
 }
 
+uint8_t Joystick_Pushed(void)
+{
+	// Returns 1 if pushed (active low), 0 otherwise
+	return !(PINB & (1 << JOYSTICK_PUSH_PIN));
+}
 
 JoystickPosition Get_Joystick_Position(JoystickCalibration calibration)
 {
@@ -188,6 +193,9 @@ void Init_ADC()
 /*Half of duty cycle in 0-255 8bit timer register*/
 	OCR1AL = 0;
 	OCR1AH = 0;
+/*setting the joystick as an PB5*/
+	DDRB &= ~(1 < JOYSTICK_PUSH_PIN);
+	PORTB |= (1 < JOYSTICK_PUSH_PIN);
 }
 
 void ADC_test(void)

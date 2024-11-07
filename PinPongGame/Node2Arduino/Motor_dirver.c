@@ -7,7 +7,7 @@ void Encoder_Init(void)
 	/* Enable peripheral clock for TC2 (Peripheral ID for TC2 is 29) */
 	PMC->PMC_PCER0 |= PMC_PCER0_PID29;
 	/* Enable peripheral clock for PIOC (Peripheral ID for PIOC is 13) */
-	PMC->PMC_PCER0 |= PMC_PCER0_PID13;
+	PMC->PMC_PCER1 |= PMC_PCER1_PID33;
 	
 	/*PIO Controller Input Filter Enable Register manual p.639*/
 	PIOC->PIO_IFER |=	PIO_PDR_P26 | 
@@ -41,16 +41,15 @@ void Encoder_Init(void)
 	/* Enable Quadrature Decoder Mode and Position Tracking Mode and Use edges of Phase A for position counting in the BMR */	
 	TC2->TC_BMR |=	TC_BMR_QDEN |	
 					TC_BMR_POSEN |
-					TC_BMR_QDTRANS |
+					TC_BMR_MAXFILT(1) |
 					TC_BMR_EDGPHA;
 
 	/* Reset the counter and enable it */
-//	TC2->TC_CHANNEL[0].TC_CCR = 0b101;
 	TC2->TC_CHANNEL[0].TC_CCR |=		TC_CCR_CLKEN |
 										TC_CCR_SWTRG;
 }
 
-int32_t Get_Encoder_Position(void) 
+uint32_t Get_Encoder_Position(void) 
 {
 	return TC2->TC_CHANNEL[0].TC_CV;
 }

@@ -12,7 +12,7 @@
 #define ADC_CHANNEL_SLIDER_LEFT 0b00000010
 #define ADC_CHANNEL_SLIDER_RIGHT 0b00000011
 #define JOYSTICK_NEUTRAL_THRESHOLD 30
-
+#define JOYSTICK_PUSH_PIN PB2
 	
 /* === Object area === */
 typedef struct
@@ -48,4 +48,5 @@ JoystickPosition Get_Joystick_Position(JoystickCalibration calibration);
 JoystickCalibration Calibrate_Joystick(void);
 int8_t Get_Joystick_Angle(JoystickPosition pos);
 int8_t Get_Slider_Position(uint8_t slider);
+uint8_t Joystick_Pushed(void);
 #endif /* ADC_DRIVER_H_ */

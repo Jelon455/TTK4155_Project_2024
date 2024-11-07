@@ -45,18 +45,24 @@ int main(void) {
 	calibration = Calibrate_Joystick();
 	CanMsg joystick_message;
 	
-	joystick_message.id = 0x22;
-	joystick_message.length = 1;
+	joystick_message.id = 0x21;
+	joystick_message.length = 3;
 	joystick_message.byte[0] = 0x00;
-	
+	joystick_message.byte[1] = 0xFF;
+	joystick_message.byte[2] = 0xFF;	
 	printf("Hello I am node 1! \r\n");
 	while (1) 
 	{
-		//JoystickPosition joystick_pos = Get_Joystick_Position(calibration);
-
-		joystick_message.byte[0] = ADC_Read(ADC_CHANNEL_X);
-
-		printf("Sending joystick x position: %d\n", joystick_message.byte[0]);
+		JoystickPosition joystick_pos = Get_Joystick_Position(calibration);
+		
+		/*Create message 1: button pressed, 2: x position joystick, 3: y position joystick*/
+		joystick_message.byte[0] = Joystick_Pushed();
+		joystick_message.byte[1] = ADC_Read(ADC_CHANNEL_X);
+		joystick_message.byte[2] = ADC_Read(ADC_CHANNEL_Y);
+		
+		printf("Button State: %d\n\r", joystick_message.byte[0]);
+		printf("Joystick position x: %d\n\r", joystick_message.byte[1]);
+		
 		CAN_Send_Message(&joystick_message);
 
 		_delay_ms(100);
