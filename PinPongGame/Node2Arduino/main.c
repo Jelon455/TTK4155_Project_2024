@@ -13,8 +13,8 @@
 #include "uart.h"
 #include "can.h"
 #include "pwm.h"
-#include "IR_driver.h"
 #include "Motor_driver.h"
+#include "Encoder_driver.h"
 
 /*Defining the  value for CAN_BR DATASHEET: page 1193*/
 #define BR_BRP		20   
@@ -38,6 +38,9 @@
 #define MIN_DUTY_CYCLE  (0.9 / 20) //0,045
 #define MAX_DUTY_CYCLE  (2.1 / 20) //0,105
 #define RANGE_DUTY_CYCLE (MAX_DUTY_CYCLE - MIN_DUTY_CYCLE) //0,06
+
+#define ERROR_SIZE 10  // Define the size of the error buffer
+
 
 void SysTick_Init(void);
 void SysTick_Handler(void);
@@ -65,9 +68,10 @@ int main(void)
 	
 	SysTick_Init();
 	
-	IR_ADC_Init();
-	
 	Encoder_Init();
+	
+	Init_gpio_motor();
+	PWM_Motor_Init();
 
 	
 	uint8_t last_state = 0;
@@ -75,13 +79,21 @@ int main(void)
 	uint8_t current_state = 0;
 	uint32_t encoder_value = 1;
 	
+	int32_t errorBuffer[ERROR_SIZE];  // Buffer to store the filter values
+	uint8_t errorIndex = 0;  // Index for the filter buffer
+	int32_t ref = 0 ;
+	int32_t u = 0 ;
+	
+	uint8_t joystick_x;
+	
+		
 	while (1) 
 	{
 		current_state = read_pin_pd9();
 		CanMsg joystick_message;
 		can_rx(&joystick_message);
-		printf("Message id 0x%x\r\n",joystick_message.id);
-		printf("Message: %d\r\n",joystick_message.byte[0]);
+		//printf("Message id 0x%x\r\n",joystick_message.id);
+		//printf("Message: %d\r\n",joystick_message.byte[0]);
 		for (volatile int i = 0; i<500000;i++);
 
 		if ((current_state != last_state) && current_state == 0) 
@@ -90,31 +102,44 @@ int main(void)
 			for (volatile int i = 0; i<100;i++);
 		}
 		last_state = current_state;
-		printf("!!!!!!!!!!!!!!! SCORE:    %d    !!!!!!!!!!!!!!!!!\n", bounce_count);
+		//printf("!!!!!!!!!!!!!!! SCORE:    %d    !!!!!!!!!!!!!!!!!\n", bounce_count);
+		
 		
 		can_printmsg(joystick_message);
 		if (joystick_message.id == 0x21)
 		{
 			uint8_t joystick_button = joystick_message.byte[0];
-			uint8_t joystick_x = joystick_message.byte[1];
+			joystick_x = joystick_message.byte[1];
+			uint8_t joystick_y = joystick_message.byte[2];
 			
-			duty_cycle = map_joystick_to_duty_cycle(joystick_x);
-			printf("duty_cycle: %f! \r\n", duty_cycle);
+			duty_cycle = map_joystick_to_duty_cycle(joystick_y);
+			//printf("duty_cycle: %f! \r\n", duty_cycle);
 			
 			if (joystick_button == 0)
 			{
 				PIOC->PIO_SODR = PIO_SODR_P18;
-				printf("Solenoid activated\n");
+				//printf("Solenoid activated\n");
 			}
 			else
 			{
 				PIOC->PIO_CODR = PIO_CODR_P18;
-				printf("Solenoid deactivated\n");
+				//printf("Solenoid deactivated\n");
 			}
 		}
-		printf("Hello I am node 2! \r\n");
+		//printf("Hello I am node 2! \r\n");
 		encoder_value = Get_Encoder_Position();
-		printf("ENCODER POSITION %lu\r\n", encoder_value);
+		printf("ENCODER POSITION %lu \r\n", encoder_value);
+		
+		
+		
+		ref = Motor_position(joystick_x,ref);
+		printf("Reference %d \r\n", ref);
+		u = PI_controller(ref, encoder_value);
+		printf("PI %d \r\n\n", u);
+		Motor_driving(u);
+		
+		for (volatile int i = 0; i<500000;i++);
+		
 	}
 
 }
@@ -177,3 +202,6 @@ void Pin_PC18_Init(void)
 	PIOC->PIO_OER |= PIO_CODR_P18;
 	
 }
+
+
+
