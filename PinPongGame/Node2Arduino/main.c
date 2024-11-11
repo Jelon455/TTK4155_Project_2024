@@ -104,7 +104,6 @@ int main(void)
 			if (joystick_button == 0)
 			{
 				PIOC->PIO_SODR = PIO_SODR_P18;
-
 				printf("Solenoid activated\n");
 			}
 			else

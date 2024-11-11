@@ -19,7 +19,7 @@ uint8_t ADC_Read(uint8_t channel)
 /*Single-ended unipolar and channel specified ADC mode*/
 	uint8_t setup = (1 << 7) | channel;
 	XMEM_Write(setup, ADC_BASE_ADDRESS);
-	_delay_ms(2);
+	_delay_ms(3);
 	return XMEM_Read(ADC_BASE_ADDRESS);
 }
 
