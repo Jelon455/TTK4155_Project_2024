@@ -40,6 +40,10 @@
 #define RANGE_DUTY_CYCLE (MAX_DUTY_CYCLE - MIN_DUTY_CYCLE) //0,06
 
 #define ERROR_SIZE 10  // Define the size of the error buffer
+#define MAX_ENCODER 4294961674UL //Maximum position from encoder
+#define F_CHANNEL_0_CLOCK  (CHIP_FREQ_CPU_MAX / 1024) //clock frequency for the PWM signal
+#define CPRD_MOTOR  ((uint32_t)(0.00004 * F_CHANNEL_0_CLOCK))//frequency of the PWM signal is 25 kHz
+
 
 
 void SysTick_Init(void);
@@ -81,7 +85,21 @@ int main(void)
 	int32_t u = 0 ;
 	
 	uint8_t joystick_x = 0;
+
 	double duty_cycle_motor = 0.0;
+	
+	/* Initilization of the motor position */
+	//PIOC->PIO_CODR = PIO_PC23;
+	//PWM->PWM_CH_NUM[0].PWM_CDTY = (uint32_t)(0.9 * CPRD_MOTOR);
+	//for (volatile int i = 0; i<5000000;i++);
+	PIOC->PIO_SODR = PIO_PC23;
+	PWM->PWM_CH_NUM[0].PWM_CDTY = (uint32_t)(0.9 * CPRD_MOTOR);
+	for (volatile int i = 0; i<5000000;i++);
+	PWM->PWM_CH_NUM[0].PWM_CDTY = (uint32_t)(0 * CPRD_MOTOR);
+	Reset_Encoder_Position();
+	encoder_value = Get_Encoder_Position();
+	printf("ENCODER POSITION END %lu \r\n", encoder_value);
+	
 	
 		
 	while (1) 
@@ -91,7 +109,7 @@ int main(void)
 		can_rx(&joystick_message);
 		//printf("Message id 0x%x\r\n",joystick_message.id);
 		//printf("Message: %d\r\n",joystick_message.byte[0]);
-		for (volatile int i = 0; i<500000;i++);
+		for (volatile int i = 0; i<50000;i++);
 
 		if ((current_state != last_state) && current_state == 0) 
 		{
@@ -111,7 +129,6 @@ int main(void)
 			
 			duty_cycle = map_joystick_to_duty_cycle(joystick_y);
 			encoder_value = Get_Encoder_Position();
-			Reset_Encoder_Position();
 			printf("ENCODER POSITION %lu \r\n", encoder_value);
 					
 			ref = Motor_position(joystick_x,ref);
@@ -119,6 +136,7 @@ int main(void)
 			u = PI_controller(ref, encoder_value);
 			printf("PI %lu \r\n\n", u);
 			Motor_driving(u);
+			
 			if (joystick_button == 0)
 			{
 				PIOC->PIO_SODR = PIO_SODR_P18;
