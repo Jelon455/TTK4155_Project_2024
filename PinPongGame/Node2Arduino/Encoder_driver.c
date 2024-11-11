@@ -126,18 +126,18 @@ void PWM_Motor_Init()
 void SimpleMotor(uint8_t x_value, double duty_cycle){
 	if (x_value > 170)
 	{
-		duty_cycle = duty_cycle + 0.05;
 		PIOC->PIO_CODR = PIO_PC23;
+		duty_cycle = 0.6;
 	}
 	else if (x_value < 160)
 	{
-			duty_cycle = duty_cycle - 0.05;
-			PIOC->PIO_SODR = PIO_PC23; 
+		PIOC->PIO_SODR = PIO_PC23; 
+		duty_cycle = 0.8;
 	}
 	else
 	{
 		duty_cycle = 0.0 ;
 	}
 	printf("Duty cycle %f \r\n",duty_cycle);
-	PWM->PWM_CH_NUM[0].PWM_CDTY = (uint32_t)(duty_cycle * CPRD);
+	PWM->PWM_CH_NUM[0].PWM_CDTY = (duty_cycle * CPRD);
 }
