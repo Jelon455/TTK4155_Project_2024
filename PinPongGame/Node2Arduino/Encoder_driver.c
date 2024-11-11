@@ -12,19 +12,22 @@
 int32_t errorBuffer[ERROR_SIZE];  // Buffer to store the filter values
 uint8_t errorIndex = 0;  // Index for the filter buffer
 
-int32_t PI_controller(int32_t ref, uint32_t pos)
+float PI_controller(int32_t ref, uint32_t pos)
 {
-	double T = 0.02; //sampling period
-	uint8_t Kp = 1 ; //1 to test it first, change value when working
-	uint8_t Ki = 5 ;
-	int32_t e = ref - ((int32_t)pos*100/MAX_ENCODER) ;
+	//double T = 0.02; //sampling period
+	float Kp = 0.05 ; //1 to test it first, change value when working
+	//uint8_t Ki = 0 ;
+	int32_t motor_position = (int32_t)pos*100/MAX_ENCODER ;
+	printf("Position %lu \n",motor_position);
+	float e = ref - motor_position;
+	printf("Erreur %f \n",e);
 	//errorBuffer[errorIndex] = e;
 	//errorIndex = (errorIndex + 1) % ERROR_SIZE; //increment position in the buffer for next value, when 10 go back to 0 and will replace value
 	//long error_sum = 0;
 	//for (int i = 0; i < ERROR_SIZE; i++) {
 		//error_sum += errorBuffer[i];
 	//}
-	int32_t u = Kp*e ; // + T*Ki*error_sum ; -> should try only P first to see how it works
+	float u = Kp*e ;//+ T*Ki*error_sum ; //-> should try only P first to see how it works
 	return u ;
 }
 
@@ -63,26 +66,26 @@ int32_t Motor_position(uint8_t joystick_position, int32_t position_ref)
 }
 
 
-void Motor_driving(int32_t u)
+void Motor_driving(float u)
 {
 	double duty_cycle_motor = 0.0 ;
 
 	if (u < 0)
 	{ // Set the phase pin high (outA is high)
-		PIOC->PIO_CODR = PIO_PC23;
+		PIOC->PIO_SODR = PIO_PC23;
 		u = -u;
 	}
 	else
 	{ // Set the phase pin low (outB is high)
-		PIOC->PIO_SODR = PIO_PC23;
+		PIOC->PIO_CODR = PIO_PC23;
 	}
-	if (u<10)
+	if (u < 1)
 		{
 			duty_cycle_motor = 0 ;
 		}
 	else
 	{
-			duty_cycle_motor = u*0.5 / 100.0 + 0.5; //0.5 is minimal speed, we increase it by a value from 0 to 0.5 depending on the error u
+			duty_cycle_motor = u*0.3 / 100.0 + 0.6; //0.7 is minimal speed, we increase it by a value from 0 to 0.5 depending on the error u
 			
 	}
 	printf("Duty cycle %f \r\n",duty_cycle_motor);
