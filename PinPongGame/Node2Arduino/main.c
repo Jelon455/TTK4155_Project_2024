@@ -84,6 +84,7 @@ int main(void)
 	int32_t u = 0 ;
 	
 	uint8_t joystick_x;
+	double duty_cycle = 0.0;
 	
 		
 	while (1) 
@@ -129,13 +130,13 @@ int main(void)
 		encoder_value = Get_Encoder_Position();
 		printf("ENCODER POSITION %lu \r\n", encoder_value);
 		
+		SimpleMotor(joystick_x, duty_cycle);
 		
-		
-		ref = Motor_position(joystick_x,ref);
-		printf("Reference %d \r\n", ref);
-		u = PI_controller(ref, encoder_value);
-		printf("PI %d \r\n\n", u);
-		Motor_driving(u);
+		//ref = Motor_position(joystick_x,ref);
+		//printf("Reference %d \r\n", ref);
+		//u = PI_controller(ref, encoder_value);
+		//printf("PI %d \r\n\n", u);
+		//Motor_driving(u);
 	}
 
 }

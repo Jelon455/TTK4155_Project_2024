@@ -60,11 +60,11 @@ void Motor_driving(int32_t u)
 
 	if (u < 0)
 	{ // Set the phase pin high (outA is high)
-	PIOD->PIO_SODR = PIO_PC23; 
+	PIOC->PIO_SODR = PIO_PC23; 
 	u = -u ;}
 	else
 	{ // Set the phase pin low (outB is high)
-	PIOD->PIO_CODR = PIO_PC23; }
+	PIOC->PIO_CODR = PIO_PC23; }
 	
 	// maximum speed (define as duty cycle = 50% -> just to test the speed, might change to 100%) is obtain when the error is bigger than half of the motor's range of motion
 	if (u > (Max_encoder/2))
@@ -73,7 +73,7 @@ void Motor_driving(int32_t u)
 	{
 		//duty_cycle = u*0.5 / (Max_encoder/2.0) ;
 	}
-	printf("Duty cycle %d \r\n",duty_cycle);
+	printf("Duty cycle %f \r\n",duty_cycle);
 	PWM->PWM_CH_NUM[0].PWM_CDTY = (uint32_t)(duty_cycle * CPRD);
 }
 
@@ -121,4 +121,23 @@ void PWM_Motor_Init()
 	/*the waveform period*/
 	PWM->PWM_CH_NUM[0].PWM_CPRD = PWM_CPRD_CPRD(CPRD); 
 	PWM->PWM_ENA |= PWM_ENA_CHID0;
+}
+
+void SimpleMotor(uint8_t x_value, double duty_cycle){
+	if (x_value > 170)
+	{
+		duty_cycle = duty_cycle + 0.05;
+		PIOC->PIO_CODR = PIO_PC23;
+	}
+	else if (x_value < 160)
+	{
+			duty_cycle = duty_cycle - 0.05;
+			PIOC->PIO_SODR = PIO_PC23; 
+	}
+	else
+	{
+		duty_cycle = 0.0 ;
+	}
+	printf("Duty cycle %f \r\n",duty_cycle);
+	PWM->PWM_CH_NUM[0].PWM_CDTY = (uint32_t)(duty_cycle * CPRD);
 }
