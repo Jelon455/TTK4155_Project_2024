@@ -53,6 +53,10 @@ int main(void)
 	joystick_message.byte[2] = 0xFF;
 		
 	printf("Hello I am node 1! \r\n");
+	
+	OLED_Init();
+	OLED_Clear();
+	Display_Menu(0);
 	while (1) 
 	{
 		JoystickPosition joystick_pos = Get_Joystick_Position(calibration);
@@ -63,13 +67,13 @@ int main(void)
 		_delay_ms(50);
 		joystick_message.byte[2] = ADC_Read(ADC_CHANNEL_Y);
 		_delay_ms(50);
-		
-		printf("Button State: %d\n\r", joystick_message.byte[0]);
-		printf("Joystick position x: %d\n\r", joystick_message.byte[1]);
-		printf("Joystick position y: %d\n\r", joystick_message.byte[2]);
+
+		//printf("Button State: %d\n\r", joystick_message.byte[0]);
+		//printf("Joystick position x: %d\n\r", joystick_message.byte[1]);
+		//printf("Joystick position y: %d\n\r", joystick_message.byte[2]);
 				
 		CAN_Send_Message(&joystick_message);
-
+		//Menu_Navigation();
 		_delay_ms(100);
 		
 	}

@@ -186,11 +186,11 @@ void Display_Subpage(int page)
 
 	if (page == 0)
 	{
-		OLED_Write_String("IT IS PAGE 1", 0, 0);
+		OLED_Write_String("START GAME", 0, 0);
 	}
 	else if (page == 1)
 	{
-		OLED_Write_String("IT IS PAGE 2", 0, 0);
+		OLED_Write_String("INFO", 0, 0);
 	}
 	else if (page == 2)
 	{

@@ -5,9 +5,9 @@
 #include "Encoder_driver.h"
 
 #define ERROR_SIZE 10  // Define the size of the error buffer
-#define Max_encoder 4294961674UL //Maximum position from encoder
-#define F_CHANNEL_1_CLOCK  (CHIP_FREQ_CPU_MAX / 1024) //clock frequency for the PWM signal
-#define CPRD  ((uint32_t)(0.00004 * F_CHANNEL_1_CLOCK))//frequency of the PWM signal is 25 kHz
+#define MAX_ENCODER 4294961674UL //Maximum position from encoder
+#define F_CHANNEL_0_CLOCK  (CHIP_FREQ_CPU_MAX / 1024) //clock frequency for the PWM signal
+#define CPRD_MOTOR  ((uint32_t)(0.00004 * F_CHANNEL_0_CLOCK))//frequency of the PWM signal is 25 kHz
 
 int32_t errorBuffer[ERROR_SIZE];  // Buffer to store the filter values
 uint8_t errorIndex = 0;  // Index for the filter buffer
@@ -34,23 +34,28 @@ int32_t Motor_position(uint8_t joystick_position, int32_t ref)
 	int32_t step ;
 	if(joystick_position <= 150) //left
 	{
-		step = (150-joystick_position)*(Max_encoder/10)/150 ; // linear step from 0% to 10% of the motor range of motion according to the joystick position
+		step = (150-joystick_position)*(MAX_ENCODER/10)/150; // linear step from 0% to 10% of the motor range of motion according to the joystick position
 		if (step > ref)
+		{
 		ref = 0 ; //maximum left side
+		}
 		else
-		ref = ref - step ;
+		{
+			ref = ref - step ;		
+		}
 	}
 	else if(joystick_position >= 170) //right
 	{
-		step = (joystick_position-170)*(Max_encoder/10)/85 ; // linear step from 0% to 10% of the motor range of motion according to the joystick position
-		if (step+ref > Max_encoder)
-		ref = Max_encoder ; //maximum right side
+		step = (joystick_position-170)*(MAX_ENCODER/10)/85 ; // linear step from 0% to 10% of the motor range of motion according to the joystick position
+		if (step+ref > MAX_ENCODER)
+		ref = MAX_ENCODER ; //maximum right side
 		else
 		ref = ref + step ;
 	}
 	else
+	{}
 	// no change in reference position
-	return ref ;
+	return ref;
 }
 
 
@@ -60,24 +65,26 @@ void Motor_driving(int32_t u)
 
 	if (u < 0)
 	{ // Set the phase pin high (outA is high)
-	PIOC->PIO_SODR = PIO_PC23; 
-	u = -u ;}
+		PIOC->PIO_SODR = PIO_PC23; 
+		u = -u;
+	}
 	else
 	{ // Set the phase pin low (outB is high)
-	PIOC->PIO_CODR = PIO_PC23; }
+		PIOC->PIO_CODR = PIO_PC23; 
+	}
 	
 	// maximum speed (define as duty cycle = 50% -> just to test the speed, might change to 100%) is obtain when the error is bigger than half of the motor's range of motion
-	if (u > (Max_encoder/2))
-	{ duty_cycle = 0.5; }
+	if (u > (MAX_ENCODER/2))
+	{ 
+		duty_cycle = 0.8; 
+	}
 	else
 	{
-		//duty_cycle = u*0.5 / (Max_encoder/2.0) ;
+		duty_cycle = u*0.8 / (MAX_ENCODER/2.0);
 	}
 	printf("Duty cycle %f \r\n",duty_cycle);
-	PWM->PWM_CH_NUM[0].PWM_CDTY = (uint32_t)(duty_cycle * CPRD);
+	PWM->PWM_CH_NUM[0].PWM_CDTY = (uint32_t)(duty_cycle * CPRD_MOTOR);
 }
-
-
 
 void PWM_Motor_Init()
  {
@@ -119,7 +126,7 @@ void PWM_Motor_Init()
 	*/
 	PWM->PWM_CH_NUM[0].PWM_CMR = PWM_CMR_CPRE_CLKA | PWM_CMR_CPOL;
 	/*the waveform period*/
-	PWM->PWM_CH_NUM[0].PWM_CPRD = PWM_CPRD_CPRD(CPRD); 
+	PWM->PWM_CH_NUM[0].PWM_CPRD = PWM_CPRD_CPRD(CPRD_MOTOR); 
 	PWM->PWM_ENA |= PWM_ENA_CHID0;
 }
 
@@ -138,6 +145,6 @@ void SimpleMotor(uint8_t x_value, double duty_cycle){
 	{
 		duty_cycle = 0.0 ;
 	}
-	printf("Duty cycle %f \r\n",duty_cycle);
-	PWM->PWM_CH_NUM[0].PWM_CDTY = (duty_cycle * CPRD);
+	printf("Duty cycle %f \r\n", duty_cycle);
+	PWM->PWM_CH_NUM[0].PWM_CDTY = (duty_cycle * CPRD_MOTOR);
 }

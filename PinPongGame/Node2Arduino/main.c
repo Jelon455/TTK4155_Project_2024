@@ -65,11 +65,8 @@ int main(void)
 	
 	init_pin_pd9_as_input();
 	Pin_PC18_Init();
-	
 	SysTick_Init();
-	
 	Encoder_Init();
-	
 	PWM_Motor_Init();
 
 	
@@ -83,7 +80,7 @@ int main(void)
 	int32_t ref = 0 ;
 	int32_t u = 0 ;
 	
-	uint8_t joystick_x;
+	uint8_t joystick_x = 0;
 	double duty_cycle_motor = 0.0;
 	
 		
@@ -113,30 +110,25 @@ int main(void)
 			uint8_t joystick_y = joystick_message.byte[2];
 			
 			duty_cycle = map_joystick_to_duty_cycle(joystick_y);
-			//printf("duty_cycle: %f! \r\n", duty_cycle);
-			
+			encoder_value = Get_Encoder_Position();
+			Reset_Encoder_Position();
+			printf("ENCODER POSITION %lu \r\n", encoder_value);
+					
+			ref = Motor_position(joystick_x,ref);
+			printf("Reference %lu \r\n", ref);
+			u = PI_controller(ref, encoder_value);
+			printf("PI %lu \r\n\n", u);
+			Motor_driving(u);
 			if (joystick_button == 0)
 			{
 				PIOC->PIO_SODR = PIO_SODR_P18;
-				//printf("Solenoid activated\n");
 			}
 			else
 			{
 				PIOC->PIO_CODR = PIO_CODR_P18;
-				//printf("Solenoid deactivated\n");
 			}
 		}
 		//printf("Hello I am node 2! \r\n");
-		encoder_value = Get_Encoder_Position();
-		printf("ENCODER POSITION %lu \r\n", encoder_value);
-		
-		SimpleMotor(joystick_x, duty_cycle_motor);
-		
-		//ref = Motor_position(joystick_x,ref);
-		//printf("Reference %d \r\n", ref);
-		//u = PI_controller(ref, encoder_value);
-		//printf("PI %d \r\n\n", u);
-		//Motor_driving(u);
 	}
 
 }
