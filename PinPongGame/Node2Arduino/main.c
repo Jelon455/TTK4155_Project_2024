@@ -70,7 +70,6 @@ int main(void)
 	
 	Encoder_Init();
 	
-	Init_gpio_motor();
 	PWM_Motor_Init();
 
 	
@@ -137,9 +136,6 @@ int main(void)
 		u = PI_controller(ref, encoder_value);
 		printf("PI %d \r\n\n", u);
 		Motor_driving(u);
-		
-		for (volatile int i = 0; i<500000;i++);
-		
 	}
 
 }
