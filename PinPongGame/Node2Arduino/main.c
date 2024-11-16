@@ -39,11 +39,9 @@
 #define MAX_DUTY_CYCLE  (2.1 / 20) //0,105
 #define RANGE_DUTY_CYCLE (MAX_DUTY_CYCLE - MIN_DUTY_CYCLE) //0,06
 
-#define ERROR_SIZE 10  // Define the size of the error buffer
-#define MAX_ENCODER 5633 //Maximum position from encoder
+//Defining clock parameters for the PWM signal of the motor
 #define F_CHANNEL_0_CLOCK  (CHIP_FREQ_CPU_MAX / 1024) //clock frequency for the PWM signal
 #define CPRD_MOTOR  ((uint32_t)(0.00004 * F_CHANNEL_0_CLOCK))//frequency of the PWM signal is 25 kHz
-
 
 
 void SysTick_Init(void);
@@ -55,8 +53,8 @@ int read_pin_pd9(void);
 void Pin_PC18_Init(void);
 
 static double duty_cycle = MIN_DUTY_CYCLE;
-static uint8_t joystick_x;
-static int32_t ref = 0 ;
+static uint8_t joystick_x; //joystick value for the motor
+static int32_t ref = 0 ; //Position reference the motor need to reach, and which is change by moving the joystick
 
 int main(void) 
 {
@@ -81,12 +79,10 @@ int main(void)
 	uint8_t current_state = 0;
 	uint32_t encoder_value = 1;
 	
-	int32_t errorBuffer[ERROR_SIZE];  // Buffer to store the filter values
-	uint8_t errorIndex = 0;  // Index for the filter buffer
+
 	
 
 
-	double duty_cycle_motor = 0.0;
 	
 	/* Initilization of the motor position */
 	//PIOC->PIO_CODR = PIO_PC23;
@@ -175,12 +171,9 @@ void SysTick_Init(void)
 void SysTick_Handler(void)
 {
 	PWM_Set_Duty_Cycle(duty_cycle);
-	//printf("Interrupt1 ok, %d \r\n",joystick_x);
 	uint32_t encoder_value = Get_Encoder_Position();
 	ref = Motor_position(joystick_x,ref);
-	//printf("Reference %lu \r\n", ref);
 	float u = PI_controller(ref, encoder_value);
-	//printf("PI %f \r\n\n", u);
 	Motor_driving(u);
 	
 }
