@@ -13,7 +13,7 @@
 #include <stdlib.h>
 
 #include "Memory_driver.h"
-//#include "Font.h"	
+
 
 /* === Define area === */
 #define OLED_COMMAND_ADDRESS 0x1000
@@ -35,4 +35,5 @@ void Display_Menu(int selected_page);
 void Display_Subpage(int page);
 void Go_To_Page(int page);
 void Menu_Navigation(void);
+void Play_Game(void);
 #endif /* OLED_DRIVER_H_ */

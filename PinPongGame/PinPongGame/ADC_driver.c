@@ -10,6 +10,7 @@
 #include "ADC_driver.h"
 #include "UART_driver.h"
 #include "Memory_driver.h"
+#include "OLED_driver.h"
 
 /* === Global variables === */
 JoystickCalibration joystick_calibration = {0,0,0,0,0};
@@ -29,128 +30,123 @@ JoystickCalibration Calibrate_Joystick(void)
 	int32_t x_sum = 0, y_sum = 0;
 	uint16_t x_min = 255, x_max = 0, y_min = 255, y_max = 0;
 	const uint16_t num_samples = 100;
-	printf(" STARTING THE CALIBRATION!   \n");
-	_delay_ms(20);
-	printf("Step 1: Setting NEUTRAL position: Do not move the joystick.\n");
-	printf("Wait 2 second!");
 
-	for (uint16_t i = 0; i < num_samples; i++)
+	OLED_Clear();
+	OLED_Write_String("CALIBRATION", 1, 30);
+	OLED_Write_String("Do not move", 5, 30);
+
+	for (uint16_t i = 0; i < num_samples; i++) 
 	{
 		uint8_t adc_x = ADC_Read(ADC_CHANNEL_X);
 		uint8_t adc_y = ADC_Read(ADC_CHANNEL_Y);
 
 		x_sum += adc_x;
 		y_sum += adc_y;
-
 		_delay_ms(20);
 	}
 
 	calibration.x_offset = (int16_t)(x_sum / num_samples);
 	calibration.y_offset = (int16_t)(y_sum / num_samples);
 
-	printf("Neutral position set!: x_offset = %d, y_offset = %d\n", calibration.x_offset, calibration.y_offset);
-	_delay_ms(500);
-	printf("Step 2: Calibration x axis: Move joystick in max RIGHT and LEFT.\n");
-	printf("Wait 2 second!");
-
-	for (uint16_t i = 0; i < num_samples; i++)
-	{
+	OLED_Clear();
+	OLED_Write_String("CALIBRATION", 1, 30);
+	OLED_Write_String("Move", 4, 40);
+	OLED_Write_String("<--->", 6, 50);
+	for (uint16_t i = 0; i < num_samples; i++) {
 		uint8_t adc_x = ADC_Read(ADC_CHANNEL_X);
-		if (adc_x > x_max) 
-		{
-			x_max = adc_x;
-		}
-		if (adc_x < x_min)
-		{ 
-			x_min = adc_x;
-		}
+
+		if (adc_x > x_max) x_max = adc_x;
+		if (adc_x < x_min) x_min = adc_x;
 		_delay_ms(20);
 	}
-	_delay_ms(500);
-	printf("Values X: x_min = %d, x_max = %d\n", x_min, x_max);
-	
-	_delay_ms(500);
-	printf("Step 3: Calibration y axis: Move joystick in max UP AND DOWN.\n");
-	printf("Wait 2 second!");
-	for (uint16_t i = 0; i < num_samples; i++)
-	{
+
+	OLED_Clear();
+	OLED_Write_String("CALIBRATION", 1, 30);
+	OLED_Write_String("Move ", 2, 40);
+	OLED_Write_String(" ^ ", 3, 50);
+	OLED_Write_String(" | ", 4, 50);
+	OLED_Write_String(" v ", 5, 50);
+
+	for (uint16_t i = 0; i < num_samples; i++) {
 		uint8_t adc_y = ADC_Read(ADC_CHANNEL_Y);
-		if (adc_y < y_min)
-		{
-			y_min = adc_y;
-		}
-		if (adc_y > y_max) 
-		{
-			y_max = adc_y;
-		}
+
+		if (adc_y > y_max) y_max = adc_y;
+		if (adc_y < y_min) y_min = adc_y;
 		_delay_ms(20);
 	}
-	_delay_ms(500);
-	printf("Values Y: y_min = %d, y_max = %d\n", y_min, y_max);
 
 	calibration.x_min = (int16_t)x_min;
 	calibration.x_max = (int16_t)x_max;
 	calibration.y_min = (int16_t)y_min;
 	calibration.y_max = (int16_t)y_max;
 
-	printf("Calibration is FINISHED!\n");
-	
+	OLED_Clear();
+	OLED_Write_String("     Done!", 3, 0);
+	_delay_ms(1000);
 	return calibration;
 }
 
 uint8_t Joystick_Pushed(void)
 {
-	// Returns 1 if pushed (active low), 0 otherwise
+	/*Returns 1 if pushed reversed logic*/
 	return !(PINB & (1 << JOYSTICK_PUSH_PIN));
 }
 
 JoystickPosition Get_Joystick_Position(JoystickCalibration calibration)
 {
 	JoystickPosition pos;
-	
 	int16_t adc_x = (int16_t)ADC_Read(ADC_CHANNEL_X);
 	_delay_ms(2);
 	int16_t adc_y = (int16_t)ADC_Read(ADC_CHANNEL_Y);
 	_delay_ms(2);
+
+	/*Calibrate the ADC readings*/
 	int16_t adc_x_calibrated = adc_x - calibration.x_offset;
 	int16_t adc_y_calibrated = adc_y - calibration.y_offset;
-	
-	if (adc_x_calibrated > 0)
+
+	/*scale X axis to 0-255*/
+	if (adc_x_calibrated >= 0) 
 	{
-		pos.x = (adc_x_calibrated * 100) / (calibration.x_max - calibration.x_offset);
+		pos.x = (adc_x_calibrated * 128) / (calibration.x_max - calibration.x_offset) + 127;
+	} 
+	else 
+	{
+		pos.x = (adc_x_calibrated * 127) / (calibration.x_offset - calibration.x_min) + 127;
 	}
-	else if (adc_x_calibrated == 0)
+
+	// Scale Y axis to 0-255
+	if (adc_y_calibrated >= 0) 
+	{
+		pos.y = (adc_y_calibrated * 128) / (calibration.y_max - calibration.y_offset) + 127;
+	} 
+	else 
+	{
+		pos.y = (adc_y_calibrated * 127) / (calibration.y_offset - calibration.y_min) + 127;
+	}
+
+	if (pos.x > 255) 
+	{
+		 pos.x = 255;
+	}
+	if (pos.x < 0) 
 	{
 		pos.x = 0;
 	}
-	else
+	if (pos.y > 255)
 	{
-		pos.x = (adc_x_calibrated * 100) / (calibration.x_offset - calibration.x_min);
+		pos.y = 255;
 	}
-
-	if (adc_y_calibrated > 0)
-	{
-		pos.y = (adc_y_calibrated * 100) / (calibration.y_max - calibration.y_offset);
-	}
-	else if (adc_y_calibrated == 0)
+	if (pos.y < 0) 
 	{
 		pos.y = 0;
-	}
-	else
-	{
-		pos.y = (adc_y_calibrated * 100) / (calibration.y_offset - calibration.y_min);
-	}
+	} 
 
-	if (pos.x > 100) pos.x = 100;
-	if (pos.x < -100) pos.x = -100;
-	if (pos.y > 100) pos.y = 100;
-	if (pos.y < -100) pos.y = -100;
-	
 	return pos;
 }
+
 char* Get_Joystick_Direction(JoystickPosition pos) 
 {	
-/*Direction based on thresholds*/
+	/*Direction based on thresholds*/
 	if (pos.x > JOYSTICK_NEUTRAL_THRESHOLD) 
 	{
 		return "RIGHT";
@@ -198,18 +194,4 @@ void Init_ADC()
 	PORTB |= (1 < JOYSTICK_PUSH_PIN);
 }
 
-void ADC_test(void)
-{
-	volatile char *ext_ram = (char *) 0x1400; // Start address for the ADC
-	uint16_t ext_ram_size = 0x400;
-
-	printf("Starting ADC test...\n");
-	uint16_t seed = rand();
-	srand(seed);
-	for (uint16_t i = 0; i < ext_ram_size; i++)
-	{
-		uint8_t some_value = rand();
-		ext_ram[i] = some_value;
-	}
-}
 

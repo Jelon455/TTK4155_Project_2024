@@ -7,6 +7,8 @@
 #include "Memory_driver.h"
 #include "fonts.h"
 #include "ADC_driver.h"
+#include "CAN_driver.h"
+#include "CAN_control.h"
 
 /* === Define area === */
 #define NUM_PAGES 3
@@ -163,9 +165,10 @@ void Display_Menu(int selected_page)
 {
 	
 	OLED_Write_String("     MAIN MENU",0,0);
-	OLED_Write_String(" Page 1",1,0);
-	OLED_Write_String(" Page 2",2,0);
-	OLED_Write_String(" Page 3",3,0);
+	OLED_Write_String(" Start Game",1,0);
+	OLED_Write_String(" Rules",2,0);
+	OLED_Write_String(" Info",3,0);
+
 	if (selected_page == 0)
 	{
 		OLED_Write_String(">",1,0);
@@ -186,23 +189,37 @@ void Display_Subpage(int page)
 
 	if (page == 0)
 	{
-		OLED_Write_String("START GAME", 0, 0);
+		OLED_Clear();
+		Play_Game();
 	}
 	else if (page == 1)
 	{
-		OLED_Write_String("INFO", 0, 0);
+		OLED_Clear();
+		OLED_Write_String("Rules:", 0, 0);
+		OLED_Write_String(" ", 1, 0);
+		OLED_Write_String("1)Do not let the", 2, 0);
+		OLED_Write_String("ball through", 3, 0);
+		OLED_Write_String(" ", 4, 0);
+		OLED_Write_String("2)Survive as", 5, 0);
+		OLED_Write_String("long as possible", 6, 0);
+		OLED_Write_String("> Back", 8, 0);
 	}
 	else if (page == 2)
 	{
-		OLED_Write_String("IT IS PAGE 3", 0, 0);
+		OLED_Clear();
+		OLED_Write_String("The game is ", 0, 0);
+		OLED_Write_String("created by ", 1, 0);
+		OLED_Write_String("group 3 ", 2, 0);
+		OLED_Write_String("For course", 3, 0);
+		OLED_Write_String("TTK4155", 4, 0);	
+		OLED_Write_String("> Back", 8, 0);
 	}
-	OLED_Write_String("> Back", 6, 0);
+	
 }
 
 void Go_To_Page(int page)
 {
 	in_subpage = 1;
-
 	Display_Subpage(page);
 
 	while (in_subpage)
@@ -212,7 +229,7 @@ void Go_To_Page(int page)
 		if (strcmp(Get_Joystick_Direction(pos), "UP") == 0 || strcmp(Get_Joystick_Direction(pos), "DOWN") == 0)
 		{
 			Display_Subpage(page);
-			_delay_ms(200);
+			_delay_ms(10);
 		}
 		if ((PINB & (1 << PINB2)) == 0)
 		{
@@ -231,17 +248,89 @@ void Menu_Navigation()
 	{
 		selected_page = (selected_page - 1 + NUM_PAGES) % NUM_PAGES;
 		Display_Menu(selected_page);
-		_delay_ms(200);
+		_delay_ms(100);
 	}
 	else if (strcmp(Get_Joystick_Direction(pos), "DOWN") == 0)
 	{
 		selected_page = (selected_page + 1) % NUM_PAGES;
 		Display_Menu(selected_page);
-		_delay_ms(200);
+		_delay_ms(100);
 	}
 
 	if ((PINB & (1 << PINB2)) == 0)
 	{
 		Go_To_Page(selected_page);
+	}
+}
+
+void Play_Game(void)
+{
+	uint16_t score = 0;
+	uint16_t last_displayed_score = 0;
+	uint8_t game_over = 0;
+
+	/*timer 1 Set prescaler to 1024*/
+	TCCR0 |= (1 << CS02) | (1 << CS00); 
+	/*Resset*/
+	TCNT0 = 0;
+	uint16_t last_timer_value = TCNT0;
+
+	OLED_Clear();
+	OLED_Write_String("Your Score: ", 2, 10);
+
+	while (!game_over) 
+	{
+		/*check timer for score increment*/
+		uint16_t current_timer_value = TCNT0;
+		if ((current_timer_value - last_timer_value) >= 240) 
+		{ 
+			/*more or less add 1 every 500ms*/
+			last_timer_value = current_timer_value;
+			score++;
+		}
+		if (score != last_displayed_score) 
+		{
+			char score_text[16];
+			snprintf(score_text, sizeof(score_text), " %d", score);
+			OLED_Write_String(score_text, 3, 30);
+			last_displayed_score = score;
+		}
+
+		/*send joystick position and button state to Node 2*/
+		CanMsg joystick_message;
+		joystick_message.id = 0x21;
+		joystick_message.length = 3;
+		joystick_message.byte[0] = Joystick_Pushed();
+		joystick_message.byte[1] = ADC_Read(ADC_CHANNEL_X);
+		joystick_message.byte[2] = ADC_Read(ADC_CHANNEL_Y);
+		
+		CAN_Send_Message(&joystick_message);
+
+		/*game over message*/
+		CanMsg received_msg;
+		CAN_Receive_Message(&received_msg);
+		if (received_msg.id == 0x11 && received_msg.byte[0] == 1)
+		{
+			game_over = 1;
+		}
+	}
+
+	/*Display Game Over screen*/
+	OLED_Clear();
+	char game_over_text[16];
+	snprintf(game_over_text, sizeof(game_over_text), "SCORE: %d", score);
+	OLED_Write_String("GAME OVER", 3, 0);
+	OLED_Write_String(game_over_text, 4, 0);
+	OLED_Write_String("> Back", 8, 0);
+
+	// Wait for user input to return to menu
+	while (1) 
+	{
+		if ((PINB & (1 << PINB2)) == 0) 
+		{
+			OLED_Clear();
+			Display_Menu(0);
+			break;
+		}
 	}
 }

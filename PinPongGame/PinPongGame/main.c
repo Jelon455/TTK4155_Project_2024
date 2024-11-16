@@ -39,43 +39,25 @@ int main(void)
 	FILE *uart_stream = fdevopen(USART_Transmit_Char, USART_Receive_Char);
 	stdout = uart_stream;
 	stdin = uart_stream;
+	
+	printf("Hello I am node 1! \r\n");
+	
+
+	OLED_Init();
+	OLED_Clear();
 
 	SPI_Init();
 	CAN_Init();
-
+	
 	calibration = Calibrate_Joystick();
-	CanMsg joystick_message;
+	_delay_ms(50);
 	
-	joystick_message.id = 0x21;
-	joystick_message.length = 3;
-	joystick_message.byte[0] = 0x00;
-	joystick_message.byte[1] = 0xFF;
-	joystick_message.byte[2] = 0xFF;
-		
-	printf("Hello I am node 1! \r\n");
-	
-	OLED_Init();
 	OLED_Clear();
 	Display_Menu(0);
+	
 	while (1) 
 	{
-		JoystickPosition joystick_pos = Get_Joystick_Position(calibration);
-		
-		/*Create message 1: button pressed, 2: x position joystick, 3: y position joystick*/
-		joystick_message.byte[0] = Joystick_Pushed();
-		joystick_message.byte[1] = ADC_Read(ADC_CHANNEL_X);
-		_delay_ms(50);
-		joystick_message.byte[2] = ADC_Read(ADC_CHANNEL_Y);
-		_delay_ms(50);
-
-		//printf("Button State: %d\n\r", joystick_message.byte[0]);
-		//printf("Joystick position x: %d\n\r", joystick_message.byte[1]);
-		//printf("Joystick position y: %d\n\r", joystick_message.byte[2]);
-				
-		CAN_Send_Message(&joystick_message);
-		//Menu_Navigation();
-		_delay_ms(100);
-		
+		Menu_Navigation();
 	}
 
 	return 0;
