@@ -15,4 +15,3 @@ void Motor_driving(float u);
 
 void PWM_Motor_Init();
 
-void SimpleMotor(uint8_t x_value, double duty_cycle);

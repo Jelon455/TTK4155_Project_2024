@@ -55,6 +55,8 @@ int read_pin_pd9(void);
 void Pin_PC18_Init(void);
 
 static double duty_cycle = MIN_DUTY_CYCLE;
+static uint8_t joystick_x;
+static int32_t ref = 0 ;
 
 int main(void) 
 {
@@ -81,10 +83,8 @@ int main(void)
 	
 	int32_t errorBuffer[ERROR_SIZE];  // Buffer to store the filter values
 	uint8_t errorIndex = 0;  // Index for the filter buffer
-	int32_t ref = 0 ;
-	float u = 0 ;
 	
-	uint8_t joystick_x = 0;
+
 
 	double duty_cycle_motor = 0.0;
 	
@@ -109,7 +109,7 @@ int main(void)
 		can_rx(&joystick_message);
 		//printf("Message id 0x%x\r\n",joystick_message.id);
 		//printf("Message: %d\r\n",joystick_message.byte[0]);
-		for (volatile int i = 0; i<50000;i++);
+		for (volatile int i = 0; i<30000;i++);
 
 		if ((current_state != last_state) && current_state == 0) 
 		{
@@ -125,18 +125,13 @@ int main(void)
 		{
 			uint8_t joystick_button = joystick_message.byte[0];
 			joystick_x = joystick_message.byte[1];
+			printf("X: %d \r\n",joystick_x);
 			uint8_t joystick_y = joystick_message.byte[2];
-			
 			duty_cycle = map_joystick_to_duty_cycle(joystick_y);
-			encoder_value = Get_Encoder_Position();
-			printf("ENCODER POSITION %lu \r\n ", (int32_t)encoder_value*100/MAX_ENCODER);
-					
-			ref = Motor_position(joystick_x,ref);
-			printf("Reference %lu \r\n", ref);
-			u = PI_controller(ref, encoder_value);
-			printf("PI %f \r\n\n", u);
-			Motor_driving(u);
 			
+			
+			//Motor_PWM(joystick_x,ref);
+					
 			if (joystick_button == 0)
 			{
 				PIOC->PIO_SODR = PIO_SODR_P18;
@@ -175,10 +170,19 @@ void SysTick_Init(void)
 }
 
 
+
 // Interrupt handler for SysTick
 void SysTick_Handler(void)
 {
-	PWM_Set_Duty_Cycle(duty_cycle); 	
+	PWM_Set_Duty_Cycle(duty_cycle);
+	//printf("Interrupt1 ok, %d \r\n",joystick_x);
+	uint32_t encoder_value = Get_Encoder_Position();
+	ref = Motor_position(joystick_x,ref);
+	//printf("Reference %lu \r\n", ref);
+	float u = PI_controller(ref, encoder_value);
+	//printf("PI %f \r\n\n", u);
+	Motor_driving(u);
+	
 }
 
 void init_pin_pd9_as_input(void) 
