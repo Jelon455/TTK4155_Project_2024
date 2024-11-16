@@ -88,49 +88,43 @@ int main(void)
 
 	double duty_cycle_motor = 0.0;
 	
-	/* Initilization of the motor position */
-	//PIOC->PIO_CODR = PIO_PC23;
-	//PWM->PWM_CH_NUM[0].PWM_CDTY = (uint32_t)(0.9 * CPRD_MOTOR);
-	//for (volatile int i = 0; i<5000000;i++);
 	PIOC->PIO_SODR = PIO_PC23;
 	PWM->PWM_CH_NUM[0].PWM_CDTY = (uint32_t)(0.9 * CPRD_MOTOR);
 	for (volatile int i = 0; i<500000;i++);
 	PWM->PWM_CH_NUM[0].PWM_CDTY = (uint32_t)(0 * CPRD_MOTOR);
 	Reset_Encoder_Position();
 	encoder_value = Get_Encoder_Position();
-	printf("ENCODER POSITION END %lu \r\n", encoder_value);
-	
-	
-		
+	CanMsg IR_message;
+	IR_message.id = 0x11;
+	IR_message.length = 1;
+	IR_message.byte[0] = 0;
 	while (1) 
 	{
 		current_state = read_pin_pd9();
 		CanMsg joystick_message;
 		can_rx(&joystick_message);
-		//printf("Message id 0x%x\r\n",joystick_message.id);
-		//printf("Message: %d\r\n",joystick_message.byte[0]);
 		for (volatile int i = 0; i<30000;i++);
 
 		if ((current_state != last_state) && current_state == 0) 
 		{
 			bounce_count++;
 			for (volatile int i = 0; i<100;i++);
+			IR_message.byte[0] = 1;
 		}
 		last_state = current_state;
-		//printf("!!!!!!!!!!!!!!! SCORE:    %d    !!!!!!!!!!!!!!!!!\n", bounce_count);
 		
-		
-		can_printmsg(joystick_message);
+		if (IR_message.byte[0] == 1)
+		{
+			can_tx(IR_message);
+			can_printmsg(IR_message);
+		}
+
 		if (joystick_message.id == 0x21)
 		{
 			uint8_t joystick_button = joystick_message.byte[0];
 			joystick_x = joystick_message.byte[1];
-			printf("X: %d \r\n",joystick_x);
 			uint8_t joystick_y = joystick_message.byte[2];
 			duty_cycle = map_joystick_to_duty_cycle(joystick_y);
-			
-			
-			//Motor_PWM(joystick_x,ref);
 					
 			if (joystick_button == 0)
 			{
@@ -141,7 +135,6 @@ int main(void)
 				PIOC->PIO_CODR = PIO_CODR_P18;
 			}
 		}
-		//printf("Hello I am node 2! \r\n");
 	}
 
 }
@@ -157,43 +150,37 @@ double map_joystick_to_duty_cycle(uint8_t adc_value)
     return MIN_DUTY_CYCLE + (RANGE_DUTY_CYCLE * ((double)adc_value/255.0));
 }
 
+/*Timer interrupt*/
 void SysTick_Init(void)
 {
-	uint32_t reload_value = 1679999; // 20 ms przy 84 MHz
+	/*20 ms clock 84 MHz*/
+	uint32_t reload_value = 1679999; 
 
-	SysTick->CTRL = 0;                        /* Wy³¹cz SysTick podczas konfiguracji */
-	SysTick->LOAD = reload_value;             /* Ustaw wartoœæ prze³adowania */
-	SysTick->VAL = 0;                         /* Reset wartoœci licznika */
-	SysTick->CTRL = SysTick_CTRL_CLKSOURCE_Msk // U¿yj zegara procesora
-	| SysTick_CTRL_TICKINT_Msk   // W³¹cz przerwanie SysTick
-	| SysTick_CTRL_ENABLE_Msk;   // W³¹cz SysTick
+	SysTick->CTRL = 0;
+	SysTick->LOAD = reload_value;
+	SysTick->VAL = 0;
+	SysTick->CTRL = SysTick_CTRL_CLKSOURCE_Msk
+	| SysTick_CTRL_TICKINT_Msk 
+	| SysTick_CTRL_ENABLE_Msk;
 }
 
-
-
-// Interrupt handler for SysTick
 void SysTick_Handler(void)
 {
 	PWM_Set_Duty_Cycle(duty_cycle);
-	//printf("Interrupt1 ok, %d \r\n",joystick_x);
 	uint32_t encoder_value = Get_Encoder_Position();
 	ref = Motor_position(joystick_x,ref);
-	//printf("Reference %lu \r\n", ref);
 	float u = PI_controller(ref, encoder_value);
-	//printf("PI %f \r\n\n", u);
 	Motor_driving(u);
 	
 }
 
 void init_pin_pd9_as_input(void) 
 {
-	// W³¹czamy zegar dla PIOD
 	PMC->PMC_PCER0 |= PMC_PCER0_PID14;
-
-	// Ustawiamy PD9 jako wejœcie
-	PIOD->PIO_PER |= PIO_PER_P9;   // W³¹czamy kontrolê portu PIO na pinie PD9
-	PIOD->PIO_ODR |= PIO_ODR_P9;   // Ustawiamy PD9 jako wejœcie
-	PIOD->PIO_PUER |= PIO_PUER_P9; // W³¹czamy rezystor pull-up na PD9 (opcjonalnie)
+	/* PD9 as input*/
+	PIOD->PIO_PER |= PIO_PER_P9;
+	PIOD->PIO_ODR |= PIO_ODR_P9;
+	PIOD->PIO_PUER |= PIO_PUER_P9;
 }
 
 void Pin_PC18_Init(void)

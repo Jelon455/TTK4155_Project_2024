@@ -41,7 +41,6 @@ typedef struct
 
 /* === Function declaration === */
 void Init_ADC(void);
-void ADC_test(void);
 uint8_t ADC_Read(uint8_t channel);
 char* Get_Joystick_Direction(JoystickPosition pos);
 JoystickPosition Get_Joystick_Position(JoystickCalibration calibration);
