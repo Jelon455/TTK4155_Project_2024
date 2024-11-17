@@ -244,17 +244,21 @@ void Menu_Navigation()
 {
 	JoystickPosition pos = Get_Joystick_Position(calibration);
 
-	if (strcmp(Get_Joystick_Direction(pos), "UP") == 0)
+	if (ADC_Read(ADC_CHANNEL_Y) > 200)
 	{
 		selected_page = (selected_page - 1 + NUM_PAGES) % NUM_PAGES;
 		Display_Menu(selected_page);
-		_delay_ms(100);
+		_delay_ms(20);
 	}
-	else if (strcmp(Get_Joystick_Direction(pos), "DOWN") == 0)
+	else if (ADC_Read(ADC_CHANNEL_Y) < 100)
 	{
 		selected_page = (selected_page + 1) % NUM_PAGES;
 		Display_Menu(selected_page);
-		_delay_ms(100);
+		_delay_ms(20);
+	}
+	else
+	{
+		/*do nothing*/
 	}
 
 	if ((PINB & (1 << PINB2)) == 0)
@@ -309,18 +313,17 @@ void Play_Game(void)
 		/*game over message*/
 		CanMsg received_msg;
 		CAN_Receive_Message(&received_msg);
-		if (received_msg.id == 0x11 && received_msg.byte[0] == 1)
+		if (!(PINB & (1 << IR_PIN)))
 		{
 			game_over = 1;
 		}
 	}
-
 	/*Display Game Over screen*/
 	OLED_Clear();
 	char game_over_text[16];
 	snprintf(game_over_text, sizeof(game_over_text), "SCORE: %d", score);
-	OLED_Write_String("GAME OVER", 3, 0);
-	OLED_Write_String(game_over_text, 4, 0);
+	OLED_Write_String("GAME OVER", 1, 0);
+	OLED_Write_String(game_over_text, 2, 0);
 	OLED_Write_String("> Back", 8, 0);
 
 	// Wait for user input to return to menu
@@ -330,6 +333,7 @@ void Play_Game(void)
 		{
 			OLED_Clear();
 			Display_Menu(0);
+			Menu_Navigation();
 			break;
 		}
 	}

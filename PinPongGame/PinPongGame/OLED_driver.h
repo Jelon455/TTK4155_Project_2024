@@ -18,7 +18,7 @@
 /* === Define area === */
 #define OLED_COMMAND_ADDRESS 0x1000
 #define OLED_DATA_ADDRESS 0x1200
-
+#define IR_PIN PB1	
 /* === Function declaration === */
 void OLED_Write_Command(uint8_t data);
 void OLED_Write_Data(uint8_t data);

@@ -151,7 +151,7 @@ char* Get_Joystick_Direction(JoystickPosition pos)
 	{
 		return "RIGHT";
 	} 
-	else if (pos.x < -JOYSTICK_NEUTRAL_THRESHOLD) 
+	else if (pos.x < JOYSTICK_NEUTRAL_THRESHOLD) 
 	{
 		return "LEFT";
 	} 
@@ -159,7 +159,7 @@ char* Get_Joystick_Direction(JoystickPosition pos)
 	{
 		return "UP";
 	} 
-	else if (pos.y < -JOYSTICK_NEUTRAL_THRESHOLD) 
+	else if (pos.y < JOYSTICK_NEUTRAL_THRESHOLD) 
 	{
 		return "DOWN";
 	} 

@@ -45,7 +45,9 @@ int main(void)
 
 	OLED_Init();
 	OLED_Clear();
-
+	/*setting ir as an PB1*/
+	DDRB &= ~(1 < IR_PIN);
+	PORTB |= (1 < IR_PIN);
 	SPI_Init();
 	CAN_Init();
 	
