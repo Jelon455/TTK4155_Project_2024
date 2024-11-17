@@ -7,6 +7,7 @@
 #define BAUND 9600
 #define F_CPU	FOCS
 
+/* === Include area === */
 #include <stdio.h> 
 
 #include "sam.h"
@@ -16,20 +17,13 @@
 #include "Motor_driver.h"
 #include "Encoder_driver.h"
 
+/* === Define area === */
 /*Defining the  value for CAN_BR DATASHEET: page 1193*/
 #define BR_BRP		20   
 #define BR_SJW		3   
 #define BR_PROP		2   
 #define BR_PHASE1	1  
 #define BR_PHASE2	1 
-
-
-/*Defining the starts point on CAN Baudrate Register CAN_BR*/
-#define BR_BRP_Pos		16
-#define BR_SJW_Pos		12
-#define BR_PROPAG_Pos	8
-#define BR_PHASE1_Pos	4
-#define BR_PHASE2_Pos	0
 
 #define F_CHANNEL_1_CLOCK  (CHIP_FREQ_CPU_MAX / 1024)
 #define PERIOD (20.0 / 1000)
@@ -39,7 +33,7 @@
 #define MAX_DUTY_CYCLE  (2.1 / 20) //0,105
 #define RANGE_DUTY_CYCLE (MAX_DUTY_CYCLE - MIN_DUTY_CYCLE) //0,06
 
-//Defining clock parameters for the PWM signal of the motor
+/*Defining clock parameters for the PWM signal of the motor*/
 #define F_CHANNEL_0_CLOCK  (CHIP_FREQ_CPU_MAX / 1024) //clock frequency for the PWM signal
 #define CPRD_MOTOR  ((uint32_t)(0.00004 * F_CHANNEL_0_CLOCK))//frequency of the PWM signal is 25 kHz
 
@@ -53,8 +47,8 @@ int read_pin_pd9(void);
 void Pin_PC18_Init(void);
 
 static double duty_cycle = MIN_DUTY_CYCLE;
-static uint8_t joystick_x; //joystick value for the motor
-static int32_t ref = 0 ; //Position reference the motor need to reach, and which is change by moving the joystick
+static uint8_t joystick_x;
+static int32_t ref = 0 ;
 
 int main(void) 
 {
@@ -66,23 +60,16 @@ int main(void)
 	can_init(canInit, 0);
 
 	PWM_Init();
-	
 	init_pin_pd9_as_input();
 	Pin_PC18_Init();
 	SysTick_Init();
 	Encoder_Init();
 	PWM_Motor_Init();
 
-	
 	uint8_t last_state = 0;
 	uint8_t bounce_count = 0;
 	uint8_t current_state = 0;
 	uint32_t encoder_value = 1;
-	
-
-	
-
-
 	
 	PIOC->PIO_SODR = PIO_PC23;
 	PWM->PWM_CH_NUM[0].PWM_CDTY = (uint32_t)(0.9 * CPRD_MOTOR);
@@ -106,14 +93,9 @@ int main(void)
 			bounce_count++;
 			for (volatile int i = 0; i<100;i++);
 			IR_message.byte[0] = 1;
+			can_tx(IR_message);
 		}
 		last_state = current_state;
-		
-		if (IR_message.byte[0] == 1)
-		{
-			can_tx(IR_message);
-			can_printmsg(IR_message);
-		}
 
 		if (joystick_message.id == 0x21)
 		{
@@ -181,20 +163,9 @@ void init_pin_pd9_as_input(void)
 
 void Pin_PC18_Init(void)
  {
-	// W³¹cz zegar dla portu D
-	/*PMC->PMC_PCER0 |= PMC_PCER0_PID14; // ID_PIOD to identyfikator PIOD
-
-	// Ustaw PD10 jako wyjœcie
-	PIOD->PIO_PER = PIO_PER_P3;      // W³¹cz kontrolê nad PD10
-	PIOD->PIO_OER = PIO_OER_P3;      // Ustaw PD10 jako wyjœcie
-	
-	
-	PIOD->PIO_CODR = PIO_CODR_P3;    // Ustaw pocz¹tkowo na niski stan
-*/	
 	PMC->PMC_PCER0 |= (1 << ID_PIOC);
 	PIOC->PIO_PER |= PIO_CODR_P18;
 	PIOC->PIO_OER |= PIO_CODR_P18;
-	
 }
 
 

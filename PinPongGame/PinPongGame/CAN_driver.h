@@ -2,8 +2,10 @@
  * CAN_driver.h
  */ 
 
+/* === Include area === */
 #include "CAN_control.h"
 
+/* === Define area === */
 #ifndef CAN_DRIVER_H_
 #define CAN_DRIVER_H_
 
@@ -22,29 +24,32 @@
 #define MCP_CANINTF     0x2C
 #define MCP_RX0IF       0x01
 
-// MCP2515 Command Bytes
+/*MCP2515 Command Bytes*/
 #define MCP2515_RESET       0xC0
 #define MCP2515_READ        0x03
 #define MCP2515_WRITE       0x02
 #define MCP2515_BIT_MODIFY  0x05
 #define MCP_REQUEST         0x81
 
-// MCP2515 Bit Masks
+/*MCP2515 Bit Masks*/
 #define MODE_MASK           0xE0  // Mode mask (bits 5, 6, 7 of CANCTRL register)
 #define MODE_NORMAL         0x00  // Normal mode (bits 5-7 of CANCTRL set to 000)
 #define MODE_LOOPBACK		0x40  // Loopback mode (CANCTRL register bits 5-7 set to 010
 #define MCP_RX0IF           0x01  // RX Buffer 0 Full Interrupt Flag
 
 typedef struct Byte8 Byte8;
-struct Byte8 {
+struct Byte8 
+{
 	uint8_t bytes[8];
 };
 
 typedef struct CanMsg CanMsg;
-struct CanMsg {
+struct CanMsg 
+{
 	uint8_t id;
 	uint8_t length;
-	union {
+	union 
+	{
 		uint8_t     byte[8];
 		uint32_t    dword[2];
 		Byte8       byte8;
@@ -55,5 +60,6 @@ struct CanMsg {
 void CAN_Init(void);
 uint8_t CAN_Receive_Message(CanMsg* msg);
 void CAN_Send_Message(CanMsg* msg);
+/* === End function declaration === */
 
 #endif /* CAN_DRIVER_H_ */

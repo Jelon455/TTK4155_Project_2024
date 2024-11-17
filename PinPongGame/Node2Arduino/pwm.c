@@ -1,13 +1,11 @@
+/*
+ * pwm.c
+ */
+
+/* === Include area === */
 #include "pwm.h"
-#include "sam.h"
 
-#define F_CHANNEL_1_CLOCK  (CHIP_FREQ_CPU_MAX / 1024)
-#define PERIOD (20.0 / 1000)
-#define CPRD  ((uint32_t)(PERIOD * F_CHANNEL_1_CLOCK))
-
-#define MIN_DUTY_CYCLE  (0.9 / 20)
-#define MAX_DUTY_CYCLE  (2.1 / 20)
-
+/* === Function definition === */
 void PWM_Init()
  {
 	/*PMC enable*/
@@ -53,3 +51,4 @@ void PWM_Set_Duty_Cycle(double duty_cycle)
 	}
 	PWM->PWM_CH_NUM[1].PWM_CDTY = (uint32_t)(duty_cycle * CPRD);
 }
+/* === End of function definition === */

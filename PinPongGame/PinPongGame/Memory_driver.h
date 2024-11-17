@@ -27,4 +27,6 @@ void Init(void);
 void SRAM_test(void);
 uint8_t XMEM_Read(uint16_t addr);
 void XMEM_Write(uint8_t data, uint16_t addr);
+/* === End function declaration === */
+
 #endif /* MOMORY_DRIVER_H_ */

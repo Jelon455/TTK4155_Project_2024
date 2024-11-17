@@ -30,6 +30,6 @@ void USART_Msg(char *str);
 char USART_Receive(void);
 int USART_Transmit_Char(char c, FILE *stream);
 int USART_Receive_Char(FILE *stream);
-
+/* === End function declaration === */
 
 #endif /* UART_DRIVER_H_ */

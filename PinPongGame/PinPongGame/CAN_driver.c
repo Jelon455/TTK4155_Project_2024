@@ -2,19 +2,19 @@
  * CAN_driver.c
  */
 
+/* === Include area === */
 #include "CAN_driver.h"
 
-/* CAN Initialization in Loop-back mode */
+/* === Function definition === */
 void CAN_Init(void) 
 {
     MCP2515_Init();
-    /*Set loopback mode (CANCTRL Mode bits = 010)*/
+    /*Set mode (CANCTRL Mode bits = 010)*/
     MCP2515_Bit_Modify(MCP_CANCTRL, 0xE0, MODE_NORMAL);
     /*Enable interrupts for receiving messages in RXB0*/
     MCP2515_Write(MCP_CANINTE, 0x01); 
 }
 
-/* CAN Message Sending Function */
 void CAN_Send_Message(CanMsg* msg)
 {
     /*Set the standard ID (11-bit) in TXB0SIDH and TXB0SIDL*/
@@ -42,8 +42,10 @@ uint8_t CAN_Receive_Message(CanMsg* msg)
     }
 
     /*Read the standard ID from RXB0SIDH and RXB0SIDL*/
-    msg->id = (MCP2515_Read(MCP_RXB0SIDH) << 3);            // Higher 8 bits of ID
-    msg->id |= (MCP2515_Read(MCP_RXB0SIDL) >> 5);           // Lower 3 bits of ID
+	/*Higher 8 bits of ID*/
+    msg->id = (MCP2515_Read(MCP_RXB0SIDH) << 3);
+	/*Lower 3 bits of ID*/            
+    msg->id |= (MCP2515_Read(MCP_RXB0SIDL) >> 5);           
 
     /*Read the data length from RXB0DLC*/
     msg->length = MCP2515_Read(MCP_RXB0DLC) & 0x0F; 
@@ -57,3 +59,4 @@ uint8_t CAN_Receive_Message(CanMsg* msg)
 
     return 1;
 }
+/* === End of function definition === */

@@ -5,13 +5,21 @@
  *  Author: mazan
  */ 
 
+/* === Include area === */
+#include <util/delay.h>
+#include <avr/interrupt.h>
+#include <avr/io.h>
+
+#include "SPI_driver.h"
+
+/* === Define area === */
+#define FOCS 4915200UL
+#define BAUND 9600
+#define F_CPU	FOCS
 
 #ifndef CAN_CONTROL_H_
 #define CAN_CONTROL_H_
 
-#include <avr/io.h>
-
-/* === Define area === */
 #define MCP2515_RESET			0xC0
 #define MCP2515_READ			0x03
 #define MCP2515_WRITE			0x02
@@ -44,8 +52,6 @@ void MCP2515_Write(uint8_t address, uint8_t data);
 uint8_t MCP2515_Read_Status(void);
 void MCP2515_Bit_Modify(uint8_t address, uint8_t mask, uint8_t data);
 void MCP2515_Request_Send(uint8_t txBuffer);
-
-
-
+/* === End function declaration === */
 
 #endif /* CAN_CONTROL_H_ */

@@ -1,6 +1,11 @@
-#include "sam.h"
+/*
+ * Motor_driver.c
+ */
+
+/* === Include area === */
 #include "Motor_driver.h"
 
+/* === Function definition === */
 void Encoder_Init(void)
 {
 	PMC->PMC_WPMR &= ~(PMC_WPMR_WPEN);
@@ -34,8 +39,6 @@ void Encoder_Init(void)
 	/*Disable wave form*/
 	TC2->TC_CHANNEL[0].TC_CMR &= ~(TC_CMR_WAVE);
     /*ENABLE TC2 Channel 0 before configuring*/
-//    TC2->TC_CHANNEL[0].TC_CCR = 0b001;
-
 	TC2->TC_CHANNEL[0].TC_CCR |= TC_CCR_CLKEN;	
 	TC2->TC_WPMR = TC_WPMR_WPKEY_PASSWD & ~(TC_WPMR_WPEN);
 	/* Enable Quadrature Decoder Mode and Position Tracking Mode and Use edges of Phase A for position counting in the BMR */	
@@ -58,3 +61,4 @@ void Reset_Encoder_Position(void)
 {
 	TC2->TC_CHANNEL[0].TC_CCR |= TC_CCR_SWTRG;
 }
+/* === End of function definition === */

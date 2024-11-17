@@ -14,5 +14,6 @@ void SPI_Write(char data);
 void SPI_Select(void);
 void SPI_Deselect(void);
 char SPI_Read(void);
+/* === End function declaration === */
 
 #endif /* CAN_CONNECTION_H_ */

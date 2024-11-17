@@ -1,6 +1,8 @@
 /*
- * CAN_connection.c
- */ 
+ * SPI_driver.c
+ */
+
+/* === Include area === */ 
 #include "SPI_driver.h"
 
 /* Define Chip Select Pin for MCP2515 */
@@ -20,20 +22,19 @@ void SPI_Init(void)
 	SPCR = (1 << SPE) | (1 << MSTR) | (1 << SPR0);
 }
 
-void SPI_Write(char data)		/* SPI write data function */
+void SPI_Write(char data)
 {
-//	char flush_buffer;
-	SPDR = data;			/* Write data to SPI data register */
-	while(!(SPSR & (1<<SPIF)));	/* Wait till transmission complete */
-//	flush_buffer = SPDR;		/* Flush received data */
-	/* Note: SPIF flag is cleared by first reading SPSR (with SPIF set) and then accessing SPDR hence flush buffer used here to access SPDR after SPSR read */
+	/* Write data to SPI data register */
+	SPDR = data;			
+	while(!(SPSR & (1<<SPIF)));
 }
 
-char SPI_Read(void)				/* SPI read data function */
+char SPI_Read(void)
 {
 	SPDR = 0xFF;
-	while(!(SPSR & (1<<SPIF)));	/* Wait till reception complete */
-	return(SPDR);			/* Return received data */
+	/* Wait till reception complete */
+	while(!(SPSR & (1<<SPIF)));
+	return(SPDR);
 }
 
 /* MCP2515 Select (CS Low) */
@@ -47,3 +48,4 @@ void SPI_Deselect(void)
 {
 	PORTB |= (1 << CS_MCP2515);
 }
+/* === End of function definition === */

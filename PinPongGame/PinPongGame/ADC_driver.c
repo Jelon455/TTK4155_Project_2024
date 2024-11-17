@@ -2,22 +2,15 @@
  * ADC_driver.c
  */
 
-/* === Include area === */
-#include <avr/io.h>
-#include <stdint.h>
-#include <math.h>
-
 #include "ADC_driver.h"
-#include "UART_driver.h"
-#include "Memory_driver.h"
-#include "OLED_driver.h"
 
-/* === Global variables === */
+/* === Variables === */
 JoystickCalibration joystick_calibration = {0,0,0,0,0};
 
+/* === Function definition === */
 uint8_t ADC_Read(uint8_t channel) 
 {
-/*Single-ended unipolar and channel specified ADC mode*/
+	/*Single-ended unipolar and channel specified ADC mode*/
 	uint8_t setup = (1 << 7) | channel;
 	XMEM_Write(setup, ADC_BASE_ADDRESS);
 	_delay_ms(3);
@@ -114,7 +107,7 @@ JoystickPosition Get_Joystick_Position(JoystickCalibration calibration)
 		pos.x = (adc_x_calibrated * 127) / (calibration.x_offset - calibration.x_min) + 127;
 	}
 
-	// Scale Y axis to 0-255
+	/*Scale Y axis to 0-255*/
 	if (adc_y_calibrated >= 0) 
 	{
 		pos.y = (adc_y_calibrated * 128) / (calibration.y_max - calibration.y_offset) + 127;
@@ -179,19 +172,18 @@ int8_t Get_Slider_Position(uint8_t slider)
 
 void Init_ADC()
 {
-/*Configure PD5 as output (to provide a clock to the ADC)*/
+	/*Configure PD5 as output (to provide a clock to the ADC)*/
 	DDRD |= (1 << ADC_CLOCK_PIN);
-/**/
 	TCCR1A &= ~(1 << WGM10) & ~(1 << WGM11);
 	TCCR1A |= (1 << COM1A0);
-/*Prescaler is 1*/
+	/*Prescaler is 1*/
 	TCCR1B |= (1 << CS10) | (1 << WGM12) ;
-/*Half of duty cycle in 0-255 8bit timer register*/
+	/*Half of duty cycle in 0-255 8bit timer register*/
 	OCR1AL = 0;
 	OCR1AH = 0;
-/*setting the joystick as an PB5*/
+	/*setting the joystick as an PB5*/
 	DDRB &= ~(1 < JOYSTICK_PUSH_PIN);
 	PORTB |= (1 < JOYSTICK_PUSH_PIN);
 }
-
+/* === End of function definition === */
 

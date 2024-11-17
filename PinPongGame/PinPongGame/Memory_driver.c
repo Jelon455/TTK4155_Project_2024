@@ -6,22 +6,24 @@
 #include "Memory_driver.h"
 
 /* === Function definition === */
-void Init() {
-/*Enable external memory interface*/
+void Init() 
+{
+	/*Enable external memory interface*/
 	MCUCR |= (1 << SRE);
-/*Disabled JTag pins on port C*/
+	/*Disabled JTag pins on port C*/
 	SFIOR |= (1 << XMM2);
 }
 
-void write_to_latch(uint8_t data) {
-/*Write data to the specified address in external memory space*/
+void write_to_latch(uint8_t data) 
+{
+	/*Write data to the specified address in external memory space*/
 	PORTE |= (1 << PE1);
 	*(volatile uint8_t *)LATCH_ADDRESS = data;
 }
 
 void SRAM_test(void)
 {
-	volatile char *ext_ram = (char *) 0x1800; // Start address for the SRAM
+	volatile char *ext_ram = (char *) 0x1800; //Start address for the SRAM
 	uint16_t ext_ram_size = 0x800;
 	uint16_t write_errors = 0;
 	uint16_t retrieval_errors = 0;

@@ -4,15 +4,6 @@
 
 /* === Include area === */
 #include "OLED_driver.h"
-#include "Memory_driver.h"
-#include "fonts.h"
-#include "ADC_driver.h"
-#include "CAN_driver.h"
-#include "CAN_control.h"
-
-/* === Define area === */
-#define NUM_PAGES 3
-#define RETURN_OPTION 1
 
 /* === Global definition area === */
 static JoystickCalibration calibration = {0,0,255,255,0,0};
@@ -56,17 +47,21 @@ void OLED_Init()
  OLED_Write_Command(0xa6); //set normal display
  OLED_Write_Command(0xaf); // display on
 }
+
 void OLED_Clear()
 {
 	for (uint8_t page = 0; page < 8; page++)
 	{
-		OLED_Write_Command(0xB0 + page);  // Set page start address
-		OLED_Write_Command(0x00);         // Set lower column start address
-		OLED_Write_Command(0x10);         // Set higher column start address
-
+		/*Set page start address*/
+		OLED_Write_Command(0xB0 + page);
+		/*Set lower column start address*/  
+		OLED_Write_Command(0x00);
+		/*Set higher column start address*/		         
+		OLED_Write_Command(0x10);         
 		for (uint8_t column = 0; column < 128; column++)
 		{
-			OLED_Write_Data(0x00);  // Clear all pixels on this page
+			/*Clear all pixels on this page*/
+			OLED_Write_Data(0x00);  
 		}
 	}
 }
@@ -83,6 +78,7 @@ void OLED_Set_Column(uint8_t column)
 	/*Masking upper bits*/
 	OLED_Write_Command(0x10 | (column >> 4));
 }
+
 void OLED_Set_Cursor(uint8_t page, uint8_t column) 
 {
 	OLED_Set_Page(page);
@@ -244,13 +240,13 @@ void Menu_Navigation()
 {
 	JoystickPosition pos = Get_Joystick_Position(calibration);
 
-	if (ADC_Read(ADC_CHANNEL_Y) > 200)
+	if (pos.y > 200)
 	{
 		selected_page = (selected_page - 1 + NUM_PAGES) % NUM_PAGES;
 		Display_Menu(selected_page);
 		_delay_ms(20);
 	}
-	else if (ADC_Read(ADC_CHANNEL_Y) < 100)
+	else if (pos.y < 100)
 	{
 		selected_page = (selected_page + 1) % NUM_PAGES;
 		Display_Menu(selected_page);
@@ -273,7 +269,7 @@ void Play_Game(void)
 	uint16_t last_displayed_score = 0;
 	uint8_t game_over = 0;
 
-	/*timer 1 Set prescaler to 1024*/
+	/*Timer 1 Set prescaler to 1024*/
 	TCCR0 |= (1 << CS02) | (1 << CS00); 
 	/*Resset*/
 	TCNT0 = 0;
@@ -284,11 +280,11 @@ void Play_Game(void)
 
 	while (!game_over) 
 	{
-		/*check timer for score increment*/
+		/*Check timer for score increment*/
 		uint16_t current_timer_value = TCNT0;
 		if ((current_timer_value - last_timer_value) >= 240) 
 		{ 
-			/*more or less add 1 every 500ms*/
+			/*More or less add 1 every 500ms*/
 			last_timer_value = current_timer_value;
 			score++;
 		}
@@ -300,7 +296,7 @@ void Play_Game(void)
 			last_displayed_score = score;
 		}
 
-		/*send joystick position and button state to Node 2*/
+		/*Send joystick position and button state to Node 2*/
 		CanMsg joystick_message;
 		joystick_message.id = 0x21;
 		joystick_message.length = 3;
@@ -310,7 +306,7 @@ void Play_Game(void)
 		
 		CAN_Send_Message(&joystick_message);
 
-		/*game over message*/
+		/*Game over message*/
 		CanMsg received_msg;
 		CAN_Receive_Message(&received_msg);
 		if (!(PINB & (1 << IR_PIN)))
@@ -326,7 +322,7 @@ void Play_Game(void)
 	OLED_Write_String(game_over_text, 2, 0);
 	OLED_Write_String("> Back", 8, 0);
 
-	// Wait for user input to return to menu
+	/*Wait for user input to return to menu*/
 	while (1) 
 	{
 		if ((PINB & (1 << PINB2)) == 0) 
@@ -338,3 +334,4 @@ void Play_Game(void)
 		}
 	}
 }
+/* === End of function definition === */

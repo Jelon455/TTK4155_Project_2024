@@ -1,123 +1,139 @@
 /*
  * Encoder_driver.c
  *
- */ 
+ */
+ 
+/* === Include area === */
 #include "Encoder_driver.h"
 
-#define ERROR_SIZE 50  // Define the size of the error buffer (for integral calculation)
-#define MAX_ENCODER 5633 //Maximum position from encoder
-#define F_CHANNEL_0_CLOCK  (CHIP_FREQ_CPU_MAX / 1024) //clock frequency for the PWM signal
-#define CPRD_MOTOR  ((uint32_t)(0.00004 * F_CHANNEL_0_CLOCK))//frequency of the PWM signal is 25 kHz
-#define CENTER_JOYSTICK_POSITION 165
-#define MINIMAL_MOTOR_SPEED 0.6
-#define MINIMAL_CORRECTION 0.5
+/* === Variables area === */
+int32_t errorBuffer[ERROR_SIZE];]
+uint8_t errorIndex = 0;
 
-
-int32_t errorBuffer[ERROR_SIZE];  // Buffer to store the error values
-uint8_t errorIndex = 0;  // Index for the filter buffer
-
+/* === Function definition === */
 float PI_controller(int32_t ref, uint32_t pos)
-// compute the correction value (u) with a PI corrector and an antiwindup
+/*compute the correction value (u) with a PI corrector and an antiwindup*/
 {
-	double T = 0.02; //sampling period
-	float Kp = 3 ; //1 to test it first, change value when working
-	float Ki = 0.05 ; //31.25
-	int32_t motor_position = (int32_t)pos*100/MAX_ENCODER ; //get the motor position on a scale from 0 to 100
+	double T = 0.02; /*sampling period*/
+	float Kp = 3 ; /*gain for P*/
+	float Ki = 0.05 ; /*31.25 gain for I part*/
+	/*get the motor position on a scale from 0 to 100*/
+	int32_t motor_position = (int32_t)pos*100/MAX_ENCODER ; 
 	float e = ref - motor_position;
 	errorBuffer[errorIndex] = e;
-	errorIndex = (errorIndex + 1) % ERROR_SIZE; //increment position in the buffer for next value, when 50 go back to 0 and will replace value
+	
+	/*increment position in the buffer for next value, when 50 go back to 0 and will replace value*/
+	errorIndex = (errorIndex + 1) % ERROR_SIZE; 
 	long error_sum = 0;
-	for (int i = 0; i < ERROR_SIZE; i++) {
+	
+	for (int i = 0; i < ERROR_SIZE; i++) 
+	{
 		error_sum += errorBuffer[i];
 	}
-	float u = Kp*e + T*Ki*error_sum ; 
-	if (u < -100 || u > 100) //anti windup : add limits to correction value + erase error value from the list to not disturb next calculus
-		{
+	
+	float u = Kp*e + T*Ki*error_sum;
+	
+	/*anti windup : add limits to correction value + erase error value from the list to not disturb next calculus*/ 
+	if (u < -100 || u > 100) 
+	{
 		if (errorIndex == 0)
-			{
-			errorBuffer[ERROR_SIZE-1] = 0 ;
-			}
-		else{
-			errorBuffer[-1] = 0 ;
-			}	
-		if (u < -100)
 		{
-			u = -100 ;
+			errorBuffer[ERROR_SIZE - 1] = 0;
 		}
 		else
 		{
-			u = 100 ;
+			errorBuffer[-1] = 0;
+		}	
+		if (u < -100)
+		{
+			u = -100;
 		}
+		else
+		{
+			u = 100;
 		}
-	return u ;
+	}
+	return u;
 }
 
 
 int32_t Motor_position(uint8_t joystick_position, int32_t position_ref)
-// give the new position reference value: it increases when the joystick is up and decreases when down
+/*give the new position reference value: it increases when the joystick is up and decreases when down*/
 {
-	int joystick_backward = CENTER_JOYSTICK_POSITION-5;
-	int joystick_forward = CENTER_JOYSTICK_POSITION+5;
-	int32_t step ; //value that will be add/remove from th reference
-	
-	if(joystick_position <= joystick_backward) //left and not close to center
+	int joystick_backward = CENTER_JOYSTICK_POSITION - 5;
+	int joystick_forward = CENTER_JOYSTICK_POSITION + 5;
+	/*value that will be add/remove from th reference*/
+	int32_t step;
+	 
+	/*left and not close to center*/
+	if (joystick_position <= joystick_backward)
 	{
-		step = (joystick_backward-joystick_position)*2/joystick_backward; // mapping between 0% and 2% of the motor range of motion according to the joystick position
+		/*mapping between 0% and 2% of the motor range of motion according to the joystick position*/
+		step = (joystick_backward - joystick_position) * 2 / joystick_backward; 
 		if (step > position_ref)
 		{
-		position_ref = 0 ; //maximum left side
+			/*maximum left side*/
+			position_ref = 0; 
 		}
 		else
 		{
-			position_ref = position_ref - step ;		
+			position_ref = position_ref - step;		
 		}
 	}
-	else if(joystick_position >= joystick_forward) //right and not close to center
+	/*right and not close to center*/
+	else if (joystick_position >= joystick_forward) 
 	{
-		step = (joystick_position-joystick_forward)*2/(255-joystick_forward) ; // mapping between 0% and 2% of the motor range of motion according to the joystick position
+		/*mapping between 0% and 2% of the motor range of motion according to the joystick position*/
+		step = (joystick_position - joystick_forward) * 2 / (255 - joystick_forward); 
 		if (step+position_ref > 100)
 		{
-		position_ref = 100 ; //maximum right side
+			/*maximum right side*/
+			position_ref = 100; 
 		}
 		else
 		{
-		position_ref = position_ref + step ;
+			position_ref = position_ref + step;
 		}
 	}
-	else // no change in reference position if joystick close to center
-	{}
+	else 
+	{
+		/*no change in reference position if joystick close to center*/
+	}
+	
 	return position_ref;
 }
 
-
 void Motor_driving(float u)
-// compute and send the duty cycle according to correction value (u)
+/*compute and send the duty cycle according to correction value (u)*/
 {
 	double duty_cycle_motor = 0.0 ;
 
 	if (u < 0)
-	{ // Set the phase pin high (outA is high)
+	{
+		/*Set the phase pin high (outA is high)*/ 
 		PIOC->PIO_SODR = PIO_PC23;
 		u = -u;
 	}
 	else
-	{ // Set the phase pin low (outB is high)
+	{
+		/*Set the phase pin low (outB is high)*/ 
 		PIOC->PIO_CODR = PIO_PC23;
 	}
-	if (u < MINIMAL_CORRECTION) //if the correction value is close enough to 0 (it can't be exactly 0)
-		{
-			duty_cycle_motor = 0 ; //not moving
-		}
+	if (u < MINIMAL_CORRECTION) 
+	{
+		/*if the correction value is close enough to 0 (it can't be exactly 0)*/
+		duty_cycle_motor = 0;
+	}
 	else
 	{
-			duty_cycle_motor = u*0.4 / 100.0 + MINIMAL_MOTOR_SPEED; //0.6 is minimal speed, we increase it by a value from 0 to 0.4 depending on the error u (u is %)
-			
+		/*0.6 is minimal speed, we increase it by a value from 0 to 0.4 depending on the error u (u is %)*/
+		duty_cycle_motor = u*0.4 / 100.0 + MINIMAL_MOTOR_SPEED;	
 	}
 	PWM->PWM_CH_NUM[0].PWM_CDTY = (uint16_t)(duty_cycle_motor * CPRD_MOTOR);
 }
 
 void PWM_Motor_Init()
-// reusing the same PWM init as for the servo + init pins for PWM and PHASE signals
+/*reusing the same PWM init as for the servo + init pins for PWM and PHASE signals*/
  {
 	/*PMC enable*/
 	PMC->PMC_WPMR &= ~(PMC_WPMR_WPEN);
@@ -128,17 +144,17 @@ void PWM_Motor_Init()
 	{
 	};
 	
-	// Enable the clock for the GPIO port
+	/*Enable the clock for the GPIO port*/
 	PMC->PMC_PCER0 = (1 << ID_PIOC);
 	PMC->PMC_PCER0 = (1 << ID_PIOB);
 
-	// Configure pin D7(on Arduino, PC23 on SAM) as an output -> PHASE/DIR
-	PIOC->PIO_PER = PIO_PC23;  // Enable PIO controller
-	PIOC->PIO_OER = PIO_PC23;  // Set as output
+	/*Configure pin D7(on Arduino, PC23 on SAM) as an output -> PHASE/DIR*/
+	PIOC->PIO_PER = PIO_PC23;
+	PIOC->PIO_OER = PIO_PC23;
 
-	// Configure pin D20(on Arduino, PB12 on SAM) as an output -> ENABLE/PWM
-	PIOB->PIO_PER = PIO_PB12;  // Enable PIO controller
-	PIOB->PIO_OER = PIO_PB12;  // Set as output
+	/*Configure pin D20(on Arduino, PB12 on SAM) as an output -> ENABLE/PWM*/
+	PIOB->PIO_PER = PIO_PB12;
+	PIOB->PIO_OER = PIO_PB12;
 		
 	/*PIOB to peripheral*/
 	PIOB->PIO_PDR |= PIO_PDR_P12;
@@ -158,3 +174,4 @@ void PWM_Motor_Init()
 	PWM->PWM_CH_NUM[0].PWM_CPRD = PWM_CPRD_CPRD(CPRD_MOTOR); 
 	PWM->PWM_ENA |= PWM_ENA_CHID0;
 }
+/* === End of function definition === */

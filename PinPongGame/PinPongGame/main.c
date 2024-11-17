@@ -21,9 +21,8 @@
 #include "CAN_control.h"
 #include "CAN_driver.h"
 
-/* === Define area === */
 
-/* === Global definition area === */
+/* === Variables area === */
 JoystickCalibration calibration = {0,0,255,255,0,0};
 int selected_page = 0;
 /*Flag informing about if user is in subpage*/

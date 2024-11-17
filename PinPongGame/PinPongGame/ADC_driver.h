@@ -1,6 +1,16 @@
 /*
  * ADC_driver.h
  */
+
+/* === Include area === */
+#include <avr/io.h>
+#include <stdint.h>
+#include <math.h>
+
+#include "UART_driver.h"
+#include "Memory_driver.h"
+#include "OLED_driver.h"
+
 #ifndef ADC_DRIVER_H_
 #define ADC_DRIVER_H_
 
@@ -48,4 +58,6 @@ JoystickCalibration Calibrate_Joystick(void);
 int8_t Get_Joystick_Angle(JoystickPosition pos);
 int8_t Get_Slider_Position(uint8_t slider);
 uint8_t Joystick_Pushed(void);
+/* === End function declaration === */
+
 #endif /* ADC_DRIVER_H_ */
